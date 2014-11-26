@@ -8,12 +8,23 @@
 
 import Cocoa
 
-class ViewController: NSViewController {
+class DataModel : NSObject {
+    override init() {}
+}
 
+class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        for i in 0 ..< 10 {
+            textview.string? += "View Loaded\n"
+            let v = btnMeasurement.state
+            textview.string? += "Button is \(v)"
+        }
+        
+        model = DataModel()
+        viewRender.model = model
     }
 
     override var representedObject: AnyObject? {
@@ -21,7 +32,11 @@ class ViewController: NSViewController {
         // Update the view, if already loaded.
         }
     }
-
-
+    
+    var model : DataModel!;
+    
+    @IBOutlet weak var viewRender: QuartzView!
+    @IBOutlet weak var textview: NSTextView!
+    @IBOutlet weak var btnMeasurement: NSButton!
 }
 

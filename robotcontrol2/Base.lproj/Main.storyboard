@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="6198" systemVersion="14A297b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6198"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -641,12 +641,12 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="robotcontrol2" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="0.0"/>
         </scene>
-        <!--Window Controller - Window-->
+        <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
@@ -667,15 +667,101 @@
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="robotcontrol2" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="500" height="433"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <splitView dividerStyle="paneSplitter" translatesAutoresizingMaskIntoConstraints="NO" id="woA-5M-adt">
+                                <rect key="frame" x="0.0" y="0.0" width="500" height="433"/>
+                                <subviews>
+                                    <customView id="zGo-DJ-tKJ">
+                                        <rect key="frame" x="0.0" y="0.0" width="500" height="207"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <subviews>
+                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="Red-Bg-S6f">
+                                                <rect key="frame" x="330" y="171" width="152" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Show Measurements" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2KJ-HV-ArX">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                            </button>
+                                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="HTx-LB-1Eb" customClass="QuartzView" customModule="robotcontrol2" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="324" height="207"/>
+                                            </customView>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="Red-Bg-S6f" firstAttribute="top" secondItem="zGo-DJ-tKJ" secondAttribute="top" constant="20" id="0J7-Um-nLx"/>
+                                            <constraint firstAttribute="trailing" secondItem="Red-Bg-S6f" secondAttribute="trailing" constant="20" id="1u9-9X-a4u"/>
+                                            <constraint firstItem="HTx-LB-1Eb" firstAttribute="top" secondItem="zGo-DJ-tKJ" secondAttribute="top" id="DVn-eP-CtZ"/>
+                                            <constraint firstItem="HTx-LB-1Eb" firstAttribute="leading" secondItem="zGo-DJ-tKJ" secondAttribute="leading" id="QIT-AP-lGU"/>
+                                            <constraint firstItem="Red-Bg-S6f" firstAttribute="leading" secondItem="HTx-LB-1Eb" secondAttribute="trailing" constant="8" id="a5m-xT-DAb"/>
+                                            <constraint firstAttribute="bottom" secondItem="HTx-LB-1Eb" secondAttribute="bottom" id="zTg-qk-Uet"/>
+                                        </constraints>
+                                    </customView>
+                                    <customView id="XCO-Kz-77H">
+                                        <rect key="frame" x="0.0" y="217" width="500" height="216"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <subviews>
+                                            <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kN3-Ou-Ld7">
+                                                <rect key="frame" x="0.0" y="0.0" width="500" height="216"/>
+                                                <clipView key="contentView" id="ClZ-6h-1D2">
+                                                    <rect key="frame" x="1" y="1" width="223" height="133"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <subviews>
+                                                        <textView editable="NO" importsGraphics="NO" richText="NO" findStyle="panel" verticallyResizable="YES" id="qav-DC-KA4">
+                                                            <rect key="frame" x="0.0" y="0.0" width="223" height="133"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                            <size key="minSize" width="498" height="214"/>
+                                                            <size key="maxSize" width="502" height="10000000"/>
+                                                            <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <size key="minSize" width="498" height="214"/>
+                                                            <size key="maxSize" width="502" height="10000000"/>
+                                                        </textView>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                </clipView>
+                                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="cR1-wj-lhM">
+                                                    <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                </scroller>
+                                                <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Uyp-pt-TAt">
+                                                    <rect key="frame" x="224" y="1" width="15" height="133"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                </scroller>
+                                            </scrollView>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="kN3-Ou-Ld7" secondAttribute="trailing" id="D6U-7Z-fKu"/>
+                                            <constraint firstItem="kN3-Ou-Ld7" firstAttribute="top" secondItem="XCO-Kz-77H" secondAttribute="top" id="Qy9-Fu-cBK"/>
+                                            <constraint firstItem="kN3-Ou-Ld7" firstAttribute="leading" secondItem="XCO-Kz-77H" secondAttribute="leading" id="cGQ-0r-le1"/>
+                                            <constraint firstAttribute="bottom" secondItem="kN3-Ou-Ld7" secondAttribute="bottom" id="zMi-mh-ewJ"/>
+                                        </constraints>
+                                    </customView>
+                                </subviews>
+                                <holdingPriorities>
+                                    <real value="250"/>
+                                    <real value="250"/>
+                                </holdingPriorities>
+                            </splitView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="woA-5M-adt" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="GSo-7w-CsU"/>
+                            <constraint firstAttribute="bottom" secondItem="woA-5M-adt" secondAttribute="bottom" id="heX-f6-4Q9"/>
+                            <constraint firstAttribute="trailing" secondItem="woA-5M-adt" secondAttribute="trailing" id="hmw-oK-Gpc"/>
+                            <constraint firstItem="woA-5M-adt" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="wvn-Zj-xah"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="btnMeasurement" destination="Red-Bg-S6f" id="29U-Gw-ozH"/>
+                        <outlet property="textview" destination="qav-DC-KA4" id="tUa-vA-pyK"/>
+                        <outlet property="viewRender" destination="HTx-LB-1Eb" id="zkd-0f-BAr"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="655"/>
+            <point key="canvasLocation" x="85" y="732.5"/>
         </scene>
     </scenes>
 </document>

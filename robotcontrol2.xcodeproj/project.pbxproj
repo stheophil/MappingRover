@@ -12,6 +12,8 @@
 		9E39FBA71A20CB82002D6835 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9E39FBA61A20CB82002D6835 /* Images.xcassets */; };
 		9E39FBAA1A20CB82002D6835 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E39FBA81A20CB82002D6835 /* Main.storyboard */; };
 		9E39FBB61A20CB82002D6835 /* robotcontrol2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBB51A20CB82002D6835 /* robotcontrol2Tests.swift */; };
+		9E39FBC21A20D163002D6835 /* QuartzView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBC11A20D163002D6835 /* QuartzView.swift */; };
+		9E39FBC41A21FFB5002D6835 /* Readme.md in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBC31A21FFB5002D6835 /* Readme.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +36,8 @@
 		9E39FBAF1A20CB82002D6835 /* robotcontrol2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = robotcontrol2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E39FBB41A20CB82002D6835 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9E39FBB51A20CB82002D6835 /* robotcontrol2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = robotcontrol2Tests.swift; sourceTree = "<group>"; };
+		9E39FBC11A20D163002D6835 /* QuartzView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuartzView.swift; sourceTree = "<group>"; };
+		9E39FBC31A21FFB5002D6835 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,9 +81,11 @@
 			children = (
 				9E39FBA21A20CB82002D6835 /* AppDelegate.swift */,
 				9E39FBA41A20CB82002D6835 /* ViewController.swift */,
+				9E39FBC11A20D163002D6835 /* QuartzView.swift */,
 				9E39FBA61A20CB82002D6835 /* Images.xcassets */,
 				9E39FBA81A20CB82002D6835 /* Main.storyboard */,
 				9E39FBA01A20CB82002D6835 /* Supporting Files */,
+				9E39FBC31A21FFB5002D6835 /* Readme.md */,
 			);
 			path = robotcontrol2;
 			sourceTree = "<group>";
@@ -208,7 +214,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E39FBC21A20D163002D6835 /* QuartzView.swift in Sources */,
 				9E39FBA51A20CB82002D6835 /* ViewController.swift in Sources */,
+				9E39FBC41A21FFB5002D6835 /* Readme.md in Sources */,
 				9E39FBA31A20CB82002D6835 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
