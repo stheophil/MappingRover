@@ -710,13 +710,13 @@
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textView editable="NO" importsGraphics="NO" richText="NO" findStyle="panel" verticallyResizable="YES" id="qav-DC-KA4">
-                                                            <rect key="frame" x="0.0" y="0.0" width="223" height="133"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="223" height="214"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                            <size key="minSize" width="498" height="214"/>
+                                                            <size key="minSize" width="483" height="214"/>
                                                             <size key="maxSize" width="502" height="10000000"/>
                                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <size key="minSize" width="498" height="214"/>
+                                                            <size key="minSize" width="483" height="214"/>
                                                             <size key="maxSize" width="502" height="10000000"/>
                                                         </textView>
                                                     </subviews>

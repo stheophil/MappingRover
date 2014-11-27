@@ -29,6 +29,35 @@ class QuartzView : NSView {
         bPath.stroke()
     }
     
+    override func keyDown(theEvent: NSEvent) {
+        if theEvent.modifierFlags & .NumericPadKeyMask != nil {
+            interpretKeyEvents([theEvent])
+        } else {
+            super.keyDown(theEvent)
+        }
+    }
+    
+    override func moveUp(sender: AnyObject?) {
+        println("^")
+    }
+    
+    override func moveDown(sender: AnyObject?) {
+        println("v")
+    }
+    
+    override func moveLeft(sender: AnyObject?) {
+        println("<")
+    }
+    
+    override func moveRight(sender: AnyObject?) {
+        println(">")
+    }
+    
+    override var acceptsFirstResponder : Bool {
+        get {
+            return true
+        }
+    }
     weak var model : DataModel!
 }
 
