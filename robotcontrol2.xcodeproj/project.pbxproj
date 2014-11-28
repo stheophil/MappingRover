@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9E1529951A28E49800FE55D3 /* BLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1529941A28E49800FE55D3 /* BLE.swift */; };
 		9E39FBA31A20CB82002D6835 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBA21A20CB82002D6835 /* AppDelegate.swift */; };
 		9E39FBA51A20CB82002D6835 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBA41A20CB82002D6835 /* ViewController.swift */; };
 		9E39FBA71A20CB82002D6835 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9E39FBA61A20CB82002D6835 /* Images.xcassets */; };
@@ -26,6 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9E1529941A28E49800FE55D3 /* BLE.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BLE.swift; sourceTree = "<group>"; };
 		9E39FB9D1A20CB82002D6835 /* robotcontrol2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = robotcontrol2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E39FBA11A20CB82002D6835 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9E39FBA21A20CB82002D6835 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				9E39FBA21A20CB82002D6835 /* AppDelegate.swift */,
+				9E1529941A28E49800FE55D3 /* BLE.swift */,
 				9E39FBA41A20CB82002D6835 /* ViewController.swift */,
 				9E39FBC11A20D163002D6835 /* QuartzView.swift */,
 				9E39FBA61A20CB82002D6835 /* Images.xcassets */,
@@ -216,6 +219,7 @@
 				9E39FBC21A20D163002D6835 /* QuartzView.swift in Sources */,
 				9E39FBA51A20CB82002D6835 /* ViewController.swift in Sources */,
 				9E39FBA31A20CB82002D6835 /* AppDelegate.swift in Sources */,
+				9E1529951A28E49800FE55D3 /* BLE.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +407,7 @@
 				9E39FBBB1A20CB82002D6835 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9E39FBBC1A20CB82002D6835 /* Build configuration list for PBXNativeTarget "robotcontrol2Tests" */ = {
 			isa = XCConfigurationList;
@@ -411,6 +416,7 @@
 				9E39FBBE1A20CB82002D6835 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

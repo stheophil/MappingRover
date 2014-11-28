@@ -38,19 +38,19 @@ class QuartzView : NSView {
     }
     
     override func moveUp(sender: AnyObject?) {
-        println("^")
+        controller.sendCommand(ECommand.Forward)
     }
     
     override func moveDown(sender: AnyObject?) {
-        println("v")
+        controller.sendCommand(ECommand.Back)
     }
     
     override func moveLeft(sender: AnyObject?) {
-        println("<")
+        controller.sendCommand(ECommand.Left)
     }
     
     override func moveRight(sender: AnyObject?) {
-        println(">")
+        controller.sendCommand(ECommand.Right)
     }
     
     override var acceptsFirstResponder : Bool {
@@ -58,6 +58,11 @@ class QuartzView : NSView {
             return true
         }
     }
-    weak var model : DataModel!
+    
+    override func viewDidHide() {
+        controller = nil
+    }
+    
+    var controller : RobotController!
 }
 
