@@ -8,19 +8,30 @@
 
 import Cocoa
 
-enum ECommand : Int {
-    case Forward
-    case Left
-    case Right
-    case Back
-}
+let MoveCommand : UInt16 = 0x1010  // arg1: movement direction & speed left, arg2: right
+
+struct SRobotCommand {
+    var cmd : UInt16;
+    var arg1 : Int16;
+    var arg2 : Int16;
+    
+    init(leftSpeed speedLeft: Int16, rightSpeed speedRight: Int16) {
+        cmd = MoveCommand
+        arg1 = speedLeft
+        arg2 = speedRight
+    }
+};
 
 struct SSensorData {
     // TODO
 }
 
 protocol RobotController {
-    func sendCommand(cmd: ECommand)
+    func moveForward()
+    func moveBackward()
+    func turnLeft()
+    func turnRight()
+    func sendCommand(cmd: SRobotCommand)
     func receivedSensorData(data: SSensorData)
     
     func log(msg: String)
@@ -48,8 +59,25 @@ class ViewController: NSViewController, RobotController {
     }
     
     // RobotController interface
-    func sendCommand(cmd: ECommand) {
-        ble.sendControlCommand(cmd.rawValue)
+    func sendCommand(var cmd: SRobotCommand) {
+        assert(sizeof(SRobotCommand)==6)
+        ble.sendControlCommand(NSData(bytes:&cmd, length:sizeof(SRobotCommand)))
+    }
+    
+    func moveForward() {
+        sendCommand(SRobotCommand(leftSpeed: 255, rightSpeed: 255))
+    }
+    
+    func moveBackward() {
+        sendCommand(SRobotCommand(leftSpeed: -255, rightSpeed: -255))
+    }
+    
+    func turnLeft() {
+        sendCommand(SRobotCommand(leftSpeed: -255, rightSpeed: 255))
+    }
+    
+    func turnRight() {
+        sendCommand(SRobotCommand(leftSpeed: 255, rightSpeed: -255))
     }
     
     func receivedSensorData(data: SSensorData) {

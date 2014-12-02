@@ -38,19 +38,19 @@ class QuartzView : NSView {
     }
     
     override func moveUp(sender: AnyObject?) {
-        controller.sendCommand(ECommand.Forward)
+        controller.moveForward()
     }
     
     override func moveDown(sender: AnyObject?) {
-        controller.sendCommand(ECommand.Back)
+        controller.moveBackward()
     }
     
     override func moveLeft(sender: AnyObject?) {
-        controller.sendCommand(ECommand.Left)
+        controller.turnLeft()
     }
     
     override func moveRight(sender: AnyObject?) {
-        controller.sendCommand(ECommand.Right)
+        controller.turnRight()
     }
     
     override var acceptsFirstResponder : Bool {

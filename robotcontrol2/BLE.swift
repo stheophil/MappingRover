@@ -112,11 +112,11 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
             && charRX != nil
     }
     
-    func sendControlCommand(var cmd : Int) {
+    func sendControlCommand(data : NSData) {
         assert(initialized())
         
         peripheralActive!.writeValue(
-            NSData(bytes: &cmd, length: 2),
+            data,
             forCharacteristic: charTX,
             type: CBCharacteristicWriteType.WithoutResponse)
     }

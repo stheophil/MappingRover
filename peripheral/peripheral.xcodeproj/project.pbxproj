@@ -1,0 +1,72 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		9E05EC111A2E34FA00161CE8 /* peripheral.ino */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; name = peripheral.ino; path = ../arduino/peripheral/peripheral.ino; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		9E05EC0A1A2E34D800161CE8 = {
+			isa = PBXGroup;
+			children = (
+				9E05EC111A2E34FA00161CE8 /* peripheral.ino */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		9E05EC0B1A2E34D800161CE8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+			};
+			buildConfigurationList = 9E05EC0E1A2E34D800161CE8 /* Build configuration list for PBXProject "peripheral" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 9E05EC0A1A2E34D800161CE8;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		9E05EC0F1A2E34D800161CE8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		9E05EC101A2E34D800161CE8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9E05EC0E1A2E34D800161CE8 /* Build configuration list for PBXProject "peripheral" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E05EC0F1A2E34D800161CE8 /* Debug */,
+				9E05EC101A2E34D800161CE8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9E05EC0B1A2E34D800161CE8 /* Project object */;
+}
