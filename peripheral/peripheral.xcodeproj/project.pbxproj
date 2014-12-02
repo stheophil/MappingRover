@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		9E05EC111A2E34FA00161CE8 /* peripheral.ino */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; name = peripheral.ino; path = ../arduino/peripheral/peripheral.ino; sourceTree = "<group>"; };
+		9E05EC121A2E3FFE00161CE8 /* peripheral.ino */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = peripheral.ino; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		9E05EC0A1A2E34D800161CE8 = {
 			isa = PBXGroup;
 			children = (
-				9E05EC111A2E34FA00161CE8 /* peripheral.ino */,
+				9E05EC121A2E3FFE00161CE8 /* peripheral.ino */,
 			);
 			sourceTree = "<group>";
 		};
