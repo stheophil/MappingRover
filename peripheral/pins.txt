@@ -1,0 +1,35 @@
+BLE Shield
+==========
+
+8, 9 (REQN, RDYN, configurable via jumper)
+50 - 53
+
+Motor Power/Direction/Current
+============================
+
+Motor 1: PWR: 4, DIR: 33, CUR: 35
+Motor 2: PWR: 5, DIR: 37, CUR: 39
+Motor 3: PWR: 6, DIR: 41, CUR: 43
+Motor 4: PWR: 7, DIR: 45, CUR: 47
+
+Motor Relay
+===========
+
+10
+
+Encoder Inputs:
+====================
+
+Motor 1: 2 (interrupt 0), 32, 34
+Motor 2: 3 (interrupt 1), 36, 38
+Motor 3: 18 (interrupt 5), 40, 42
+Motor 4: 19 (interrupt 4), 44, 46
+
+(1000 state changes per three wheel rotations)
+
+Gyro:
+=====
+
+TWI: 20 (SDA) and 21 (SCL). Support TWI communication using the Wire library. Note that these pins are not in the same location as the TWI pins on the Duemilanove or Diecimila
+
+20 (interrupt 3), and 21 (interrupt 2)
