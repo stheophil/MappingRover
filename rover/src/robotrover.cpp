@@ -1,8 +1,9 @@
+#include "Arduino.h"
 #include "peripheral_fwd.h"
 
-#include <SPI.h>
-#include <boards.h>
-#include <RBL_nRF8001.h>
+#include "SPI.h"
+#include "boards.h"
+#include "RBL_nRF8001.h"
 
 struct SMotor {
     const int POWER;
@@ -38,10 +39,10 @@ SMotor c_amotors[] = {
     {7, 45, 47, 4, 44, 46}
 };
 
-void OnMotor0Interrupt() { c_amotors[0].onInterrupt(); }
-void OnMotor1Interrupt() { c_amotors[1].onInterrupt(); }
-void OnMotor2Interrupt() { c_amotors[2].onInterrupt(); }
-void OnMotor3Interrupt() { c_amotors[3].onInterrupt(); }
+void OnMotor0Interrupt() { c_amotors[0].onInterrupt(); }
+void OnMotor1Interrupt() { c_amotors[1].onInterrupt(); }
+void OnMotor2Interrupt() { c_amotors[2].onInterrupt(); }
+void OnMotor3Interrupt() { c_amotors[3].onInterrupt(); }
 
 void (*c_afnInterrupts[4])() = {
   OnMotor0Interrupt, OnMotor1Interrupt, OnMotor2Interrupt, OnMotor3Interrupt

@@ -7,18 +7,14 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		9E05EC121A2E3FFE00161CE8 /* peripheral.ino */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = peripheral.ino; sourceTree = "<group>"; };
-		9ED4BADA1A3B826100CD2D9C /* pins.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = pins.txt; sourceTree = "<group>"; };
-		9ED4BADB1A3EFF1C00CD2D9C /* peripheral_fwd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = peripheral_fwd.h; sourceTree = "<group>"; };
+		9ED4BB661A45867F00CD2D9C /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		9E05EC0A1A2E34D800161CE8 = {
 			isa = PBXGroup;
 			children = (
-				9ED4BADB1A3EFF1C00CD2D9C /* peripheral_fwd.h */,
-				9ED4BADA1A3B826100CD2D9C /* pins.txt */,
-				9E05EC121A2E3FFE00161CE8 /* peripheral.ino */,
+				9ED4BB661A45867F00CD2D9C /* src */,
 			);
 			sourceTree = "<group>";
 		};
@@ -30,7 +26,7 @@
 			attributes = {
 				LastUpgradeCheck = 0610;
 			};
-			buildConfigurationList = 9E05EC0E1A2E34D800161CE8 /* Build configuration list for PBXProject "peripheral" */;
+			buildConfigurationList = 9E05EC0E1A2E34D800161CE8 /* Build configuration list for PBXProject "rover" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -61,7 +57,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9E05EC0E1A2E34D800161CE8 /* Build configuration list for PBXProject "peripheral" */ = {
+		9E05EC0E1A2E34D800161CE8 /* Build configuration list for PBXProject "rover" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9E05EC0F1A2E34D800161CE8 /* Debug */,

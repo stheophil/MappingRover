@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:peripheral/peripheral.xcodeproj">
+      location = "group:rover/rover.xcodeproj">
    </FileRef>
    <FileRef
       location = "container:robotcontrol2.xcodeproj">
