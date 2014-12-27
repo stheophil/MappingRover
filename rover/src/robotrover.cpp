@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "peripheral_fwd.h"
+#include "ahrs.h"
 
 #include "SPI.h"
 #include "boards.h"
@@ -70,6 +71,9 @@ void setup()
       attachInterrupt(c_amotors[i].ENCODER_IRQ, c_afnInterrupts[i], CHANGE);
     }
    
+    // AHRS
+    setupAHRS();
+    
     Serial.println("BLE Arduino RobotController");
 }
 
@@ -158,29 +162,16 @@ static const unsigned long c_nTIMETOSTOP = 200; // ms
 
 void loop()
 {
-    if(ble_available())
-    {
-        SRobotCommand cmd;
-        char* pcmd = (char*)&cmd;
-        char* pcmdEnd = pcmd+sizeof(SRobotCommand);
-        for(; pcmd<pcmdEnd && ble_available(); ++pcmd) {
-            *pcmd = ble_read();
-        }
-        if(pcmd==pcmdEnd) {
-            g_nLastCommand = millis();
-            HandleCommand(cmd);
-        } else {
-            Serial.print("Incomplete Command. Read ");
-            Serial.print(pcmd - (char*)&cmd);
-            Serial.println(" bytes");
-        }
-        
-        ble_do_events();
-        return;
-    } if(c_nTIMETOSTOP < millis()-g_nLastCommand) {
-        SRobotCommand cmdStop = {ecmdSTOP, 0, 0};
-        HandleCommand(cmdStop);
-    } else if(ble_connected()!=g_bConnected) {
+    if(updateAHRS()) {
+        Serial.print("Orientation: ");
+        Serial.print(roll);
+        Serial.print(", ");
+        Serial.print(pitch);
+        Serial.print(", ");
+        Serial.println(yaw);
+    }
+    
+    if(ble_connected()!=g_bConnected) {
         g_bConnected=ble_connected();
         if(g_bConnected) {
             OnConnection();
@@ -188,5 +179,32 @@ void loop()
             OnDisconnection();
         }
     }
+    
+    if(g_bConnected) {
+        if(ble_available())
+        {
+            SRobotCommand cmd;
+            char* pcmd = (char*)&cmd;
+            char* pcmdEnd = pcmd+sizeof(SRobotCommand);
+            for(; pcmd<pcmdEnd && ble_available(); ++pcmd) {
+                *pcmd = ble_read();
+            }
+            if(pcmd==pcmdEnd) {
+                g_nLastCommand = millis();
+                HandleCommand(cmd);
+            } else {
+                Serial.print("Incomplete Command. Read ");
+                Serial.print(pcmd - (char*)&cmd);
+                Serial.println(" bytes");
+            }
+            
+            ble_do_events();
+            return;
+        } if(c_nTIMETOSTOP < millis()-g_nLastCommand) {
+            SRobotCommand cmdStop = {ecmdSTOP, 0, 0};
+            HandleCommand(cmdStop);
+        }
+    }
+    
     ble_do_events();
 }
