@@ -9,12 +9,16 @@
 import Cocoa
 
 protocol RobotController {
+    // Robot control
     func moveForward()
     func moveBackward()
     func turnLeft()
     func turnRight()
     func sendCommand(cmd: SRobotCommand)
+    
+    // Robot sensors
     func receivedSensorData(data: SSensorData)
+    func sensorData() -> [SSensorData]
     
     func log(msg: String)
 }
@@ -65,13 +69,28 @@ class ViewController: NSViewController, RobotController {
     }
     
     func receivedSensorData(data: SSensorData) {
-        log("Sensor data Z: \(data.m_nYaw) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
+        if sensorDataArray.last?.m_nYaw != data.m_nYaw
+            || data.m_anEncoderTicks.0 != 0
+            || data.m_anEncoderTicks.1 != 0
+            || data.m_anEncoderTicks.2 != 0
+            || data.m_anEncoderTicks.3 != 0
+        {
+            log("Sensor data Z: \(data.m_nYaw) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
+            sensorDataArray.append(data)
+            viewRender.needsDisplay = true
+        }
+    }
+    
+    func sensorData() -> [SSensorData] {
+        return sensorDataArray
     }
     
     func log(msg: String) {
         textview.string? += msg
         textview.scrollRangeToVisible(NSMakeRange(textview.string!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding), 0))
     }
+    
+    var sensorDataArray = [SSensorData]()
     
     var ble : BLE!;
     

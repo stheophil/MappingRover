@@ -20,7 +20,11 @@ class QuartzView : NSView {
         background.fill()
         
         var transform = NSAffineTransform()
+        
         transform.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
+        if !controller.sensorData().isEmpty {
+            transform.rotateByDegrees(CGFloat( -controller.sensorData().last!.m_nYaw ))
+        }
         transform.concat()
         
         let bPath = NSBezierPath(rect: NSMakeRect(-5.0, -5.0, 10.0, 10.0))
