@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "peripheral_fwd.h"
+#include "rover.h"
 #include "ahrs.h"
 
 #include "SPI.h"
@@ -66,7 +66,13 @@ void setup()
 
     ble_set_name("rcontrol2");
     ble_begin();
-
+    
+    
+    Serial.print("sizeof(SRobotCommand) = ");
+    Serial.println(sizeof(SRobotCommand));
+    Serial.print("sizeof(SSensorData) = ");
+    Serial.println(sizeof(SSensorData));
+    
     // Port setup
     pinMode(RELAY_PIN, OUTPUT);
     digitalWrite(RELAY_PIN, HIGH);
@@ -95,37 +101,19 @@ void OnDisconnection() {
     digitalWrite(RELAY_PIN, HIGH);
 }
 
-enum ECommand {
-    ecmdSTOP = 0x1001,
-    ecmdMOVE = 0x1010
-};
-
-struct SRobotCommand {
-    ECommand cmd;
-    int arg1;
-    int arg2;
-};
-
-struct SSensorData { // must be < 64 bytes
-    int m_nPitch;
-    int m_nRoll;
-    int m_nYaw;
-    int m_aEncoderTicks[4];
-};
-
 void HandleCommand(SRobotCommand const& cmd) {
-    switch(cmd.cmd) {
+    switch(cmd.m_cmd) {
         case ecmdMOVE:
             // LEFT MOTORS:
-            digitalWrite(g_amotors[0].DIR, cmd.arg1 < 0 ? LOW : HIGH);
-            analogWrite(g_amotors[0].POWER, abs(cmd.arg1));
-            digitalWrite(g_amotors[2].DIR, cmd.arg1 < 0 ? LOW : HIGH);
-            analogWrite(g_amotors[2].POWER, abs(cmd.arg1));
+            digitalWrite(g_amotors[0].DIR, cmd.m_nSpeedLeft < 0 ? LOW : HIGH);
+            analogWrite(g_amotors[0].POWER, abs(cmd.m_nSpeedLeft));
+            digitalWrite(g_amotors[2].DIR, cmd.m_nSpeedLeft < 0 ? LOW : HIGH);
+            analogWrite(g_amotors[2].POWER, abs(cmd.m_nSpeedLeft));
             // RIGHT MOTORS
-            digitalWrite(g_amotors[1].DIR, cmd.arg2 < 0 ? LOW : HIGH);
-            analogWrite(g_amotors[1].POWER, abs(cmd.arg2));
-            digitalWrite(g_amotors[3].DIR, cmd.arg2 < 0 ? LOW : HIGH);
-            analogWrite(g_amotors[3].POWER, abs(cmd.arg2));
+            digitalWrite(g_amotors[1].DIR, cmd.m_nSpeedRight < 0 ? LOW : HIGH);
+            analogWrite(g_amotors[1].POWER, abs(cmd.m_nSpeedRight));
+            digitalWrite(g_amotors[3].DIR, cmd.m_nSpeedRight < 0 ? LOW : HIGH);
+            analogWrite(g_amotors[3].POWER, abs(cmd.m_nSpeedRight));
             break;
             
         case ecmdSTOP:

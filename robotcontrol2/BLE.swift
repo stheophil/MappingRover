@@ -103,7 +103,7 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     {
         assert(error==nil)
         var data = charRX.value()
-        if(data.length==SIZEOF_SSENSORDATA) {
+        if(data.length==sizeof(SSensorData)) {
             controller.receivedSensorData(UnsafePointer<SSensorData>(data.bytes).memory)
         }
     }
