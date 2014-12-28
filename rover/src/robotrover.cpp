@@ -23,16 +23,22 @@ struct SMotor {
         pinMode(ENC1, INPUT);
         pinMode(ENC2, INPUT);
         
-        m_cTicks = 0;
+        m_nTicks = 0;
     }
     
-    int m_cTicks;
+    int m_nTicks;
     void onInterrupt() {
-        ++m_cTicks;
+        ++m_nTicks;
+    }
+    
+    int Pop() {
+        int nTick = m_nTicks;
+        m_nTicks = 0;
+        return nTick;
     }
 };
 
-SMotor c_amotors[] = {
+SMotor g_amotors[] = {
     // See pins.txt
     {4, 33, 35, 0, 32, 34},
     {5, 37, 39, 1, 36, 38},
@@ -40,10 +46,10 @@ SMotor c_amotors[] = {
     {7, 45, 47, 4, 44, 46}
 };
 
-void OnMotor0Interrupt() { c_amotors[0].onInterrupt(); }
-void OnMotor1Interrupt() { c_amotors[1].onInterrupt(); }
-void OnMotor2Interrupt() { c_amotors[2].onInterrupt(); }
-void OnMotor3Interrupt() { c_amotors[3].onInterrupt(); }
+void OnMotor0Interrupt() { g_amotors[0].onInterrupt(); }
+void OnMotor1Interrupt() { g_amotors[1].onInterrupt(); }
+void OnMotor2Interrupt() { g_amotors[2].onInterrupt(); }
+void OnMotor3Interrupt() { g_amotors[3].onInterrupt(); }
 
 void (*c_afnInterrupts[4])() = {
   OnMotor0Interrupt, OnMotor1Interrupt, OnMotor2Interrupt, OnMotor3Interrupt
@@ -67,8 +73,8 @@ void setup()
     
     // Motor setup
     for(int i=0; i<4; ++i) {
-      c_amotors[i].setup();
-      attachInterrupt(c_amotors[i].ENCODER_IRQ, c_afnInterrupts[i], CHANGE);
+      g_amotors[i].setup();
+      attachInterrupt(g_amotors[i].ENCODER_IRQ, c_afnInterrupts[i], CHANGE);
     }
    
     // AHRS
@@ -76,17 +82,6 @@ void setup()
     
     Serial.println("BLE Arduino RobotController");
 }
-
-enum ECommand {
-    ecmdSTOP = 0x1001,
-    ecmdMOVE = 0x1010
-};
-
-struct SRobotCommand {
-    ECommand cmd;
-    int arg1;
-    int arg2;
-};
 
 void OnConnection() {
     Serial.println("Connected");
@@ -100,23 +95,41 @@ void OnDisconnection() {
     digitalWrite(RELAY_PIN, HIGH);
 }
 
+enum ECommand {
+    ecmdSTOP = 0x1001,
+    ecmdMOVE = 0x1010
+};
+
+struct SRobotCommand {
+    ECommand cmd;
+    int arg1;
+    int arg2;
+};
+
+struct SSensorData { // must be < 64 bytes
+    int m_nPitch;
+    int m_nRoll;
+    int m_nYaw;
+    int m_aEncoderTicks[4];
+};
+
 void HandleCommand(SRobotCommand const& cmd) {
     switch(cmd.cmd) {
         case ecmdMOVE:
             // LEFT MOTORS:
-            digitalWrite(c_amotors[0].DIR, cmd.arg1 < 0 ? LOW : HIGH);
-            analogWrite(c_amotors[0].POWER, abs(cmd.arg1));
-            digitalWrite(c_amotors[2].DIR, cmd.arg1 < 0 ? LOW : HIGH);
-            analogWrite(c_amotors[2].POWER, abs(cmd.arg1));
+            digitalWrite(g_amotors[0].DIR, cmd.arg1 < 0 ? LOW : HIGH);
+            analogWrite(g_amotors[0].POWER, abs(cmd.arg1));
+            digitalWrite(g_amotors[2].DIR, cmd.arg1 < 0 ? LOW : HIGH);
+            analogWrite(g_amotors[2].POWER, abs(cmd.arg1));
             // RIGHT MOTORS
-            digitalWrite(c_amotors[1].DIR, cmd.arg2 < 0 ? LOW : HIGH);
-            analogWrite(c_amotors[1].POWER, abs(cmd.arg2));
-            digitalWrite(c_amotors[3].DIR, cmd.arg2 < 0 ? LOW : HIGH);
-            analogWrite(c_amotors[3].POWER, abs(cmd.arg2));
+            digitalWrite(g_amotors[1].DIR, cmd.arg2 < 0 ? LOW : HIGH);
+            analogWrite(g_amotors[1].POWER, abs(cmd.arg2));
+            digitalWrite(g_amotors[3].DIR, cmd.arg2 < 0 ? LOW : HIGH);
+            analogWrite(g_amotors[3].POWER, abs(cmd.arg2));
             break;
             
         case ecmdSTOP:
-            for(int i=0; i<4; ++i) analogWrite(c_amotors[i].POWER, 0);
+            for(int i=0; i<4; ++i) analogWrite(g_amotors[i].POWER, 0);
             break;
             
         default: ;
@@ -135,7 +148,7 @@ void MeasurementLoop() {
         delay(50);
         
         for(int i=0; i<4; ++i) {
-            anTicks[iTick * 4 + i] = c_amotors[i].m_cTicks;
+            anTicks[iTick * 4 + i] = g_amotors[i].m_cTicks;
         }
     }
     
@@ -163,12 +176,15 @@ static const unsigned long c_nTIMETOSTOP = 200; // ms
 void loop()
 {
     if(updateAHRS()) {
-        Serial.print("Orientation: ");
-        Serial.print(roll);
-        Serial.print(", ");
-        Serial.print(pitch);
-        Serial.print(", ");
-        Serial.println(yaw);
+        SSensorData data = {
+            g_nRoll, g_nPitch, g_nYaw,
+            g_amotors[0].Pop(),
+            g_amotors[1].Pop(),
+            g_amotors[2].Pop(),
+            g_amotors[3].Pop()
+        };
+        ble_write_bytes((byte*)&data, sizeof(data));
+        ble_do_events();
     }
     
     if(ble_connected()!=g_bConnected) {

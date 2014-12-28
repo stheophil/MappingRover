@@ -484,6 +484,11 @@ void setupAHRS()
     counter=0;
 }
 
+// output
+int g_nRoll;
+int g_nPitch;
+int g_nYaw;
+
 bool updateAHRS() //Main Loop
 {
     if((millis()-timer)>=20)  // Main loop runs at 50Hz
@@ -513,6 +518,11 @@ bool updateAHRS() //Main Loop
         Normalize();
         Drift_correction();
         Euler_angles();
+        
+        g_nRoll = ToDeg(roll);
+        g_nPitch = ToDeg(pitch);
+        g_nYaw = ToDeg(yaw);
+        
         // ***
         return true;
     } else {

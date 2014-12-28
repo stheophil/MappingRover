@@ -102,7 +102,10 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!)
     {
         assert(error==nil)
-        // TODO: read sensor data
+        var data = charRX.value()
+        if(data.length==SIZEOF_SSENSORDATA) {
+            controller.receivedSensorData(UnsafePointer<SSensorData>(data.bytes).memory)
+        }
     }
     
     // Data interface

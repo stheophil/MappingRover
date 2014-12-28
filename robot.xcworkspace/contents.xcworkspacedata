@@ -2,12 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:rover/src/ahrs.cpp">
-   </FileRef>
-   <FileRef
-      location = "group:rover/src/ahrs.h">
-   </FileRef>
-   <FileRef
       location = "group:rover/rover.xcodeproj">
    </FileRef>
    <FileRef

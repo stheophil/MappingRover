@@ -8,12 +8,13 @@
 
 import Cocoa
 
+// TODO: Take definitions from common C header
 let MoveCommand : UInt16 = 0x1010  // arg1: movement direction & speed left, arg2: right
 
 struct SRobotCommand {
-    var cmd : UInt16;
-    var arg1 : Int16;
-    var arg2 : Int16;
+    var cmd : UInt16
+    var arg1 : Int16
+    var arg2 : Int16
     
     init(leftSpeed speedLeft: Int16, rightSpeed speedRight: Int16) {
         cmd = MoveCommand
@@ -23,8 +24,16 @@ struct SRobotCommand {
 };
 
 struct SSensorData {
-    // TODO
-}
+    var pitch : Int16
+    var roll : Int16
+    var yaw : Int16
+    var ticks0 : Int16;
+    var ticks1 : Int16;
+    var ticks2 : Int16;
+    var ticks3 : Int16;
+};
+
+let SIZEOF_SSENSORDATA = 14; // sizeof(SSensorData) in Swift != sizeof(SSensorData) in C
 
 protocol RobotController {
     func moveForward()
@@ -81,10 +90,12 @@ class ViewController: NSViewController, RobotController {
     }
     
     func receivedSensorData(data: SSensorData) {
+        log("Sensor data Z: \(data.yaw) Distances: \(data.ticks0), \(data.ticks1), \(data.ticks2), \(data.ticks3)\n")
     }
     
     func log(msg: String) {
         textview.string? += msg
+        textview.scrollRangeToVisible(NSMakeRange(textview.string!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding), 0))
     }
     
     var ble : BLE!;

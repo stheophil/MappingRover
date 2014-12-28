@@ -12,8 +12,8 @@
 void setupAHRS();
 bool updateAHRS();
 
-extern float roll;
-extern float pitch;
-extern float yaw;
+extern int g_nRoll;
+extern int g_nPitch;
+extern int g_nYaw;
 
 #endif /* defined(____ahrs__) */
