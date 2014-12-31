@@ -13,7 +13,7 @@ struct SRobotCommand {
 };
 
 struct SSensorData { // must be < 64 bytes
-    short m_nPitch;
+    short m_nPitch; // angles in 1/1000 radians
     short m_nRoll;
     short m_nYaw;
     short m_anEncoderTicks[4];

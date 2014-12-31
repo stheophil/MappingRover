@@ -519,9 +519,9 @@ bool updateAHRS() //Main Loop
         Drift_correction();
         Euler_angles();
         
-        g_nRoll = ToDeg(roll);
-        g_nPitch = ToDeg(pitch);
-        g_nYaw = ToDeg(yaw);
+        g_nRoll = (int)(roll * 1000 + 0.5);
+        g_nPitch = (int)(pitch * 1000 + 0.5);
+        g_nYaw = (int)(yaw * 1000 + 0.5);
         
         // ***
         return true;

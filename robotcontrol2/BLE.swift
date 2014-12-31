@@ -116,12 +116,12 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     }
     
     func sendControlCommand(data : NSData) {
-        assert(initialized())
-        
-        peripheralActive!.writeValue(
-            data,
-            forCharacteristic: charTX,
-            type: CBCharacteristicWriteType.WithoutResponse)
+        if initialized() {
+            peripheralActive!.writeValue(
+                data,
+                forCharacteristic: charTX,
+                type: CBCharacteristicWriteType.WithoutResponse)
+        }
     }
     
     var controller : RobotController // TODO: Can't set to weak var

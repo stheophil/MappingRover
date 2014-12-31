@@ -12,6 +12,7 @@
 void setupAHRS();
 bool updateAHRS();
 
+// in 1/1000 radians:
 extern int g_nRoll;
 extern int g_nPitch;
 extern int g_nYaw;

@@ -26,6 +26,13 @@ struct SMotor {
         m_nTicks = 0;
     }
     
+    int m_nSpeed;
+    void SetSpeed(int nSpeed) {
+        m_nSpeed = nSpeed;
+        digitalWrite(DIR, m_nSpeed < 0 ? LOW : HIGH);
+        analogWrite(POWER, abs(m_nSpeed));
+    }
+    
     int m_nTicks;
     void onInterrupt() {
         ++m_nTicks;
@@ -34,7 +41,7 @@ struct SMotor {
     int Pop() {
         int nTick = m_nTicks;
         m_nTicks = 0;
-        return nTick;
+        return nTick * (m_nSpeed < 0 ? -1 : 1);
     }
 };
 
@@ -105,23 +112,31 @@ void HandleCommand(SRobotCommand const& cmd) {
     switch(cmd.m_cmd) {
         case ecmdMOVE:
             // LEFT MOTORS:
-            digitalWrite(g_amotors[0].DIR, cmd.m_nSpeedLeft < 0 ? LOW : HIGH);
-            analogWrite(g_amotors[0].POWER, abs(cmd.m_nSpeedLeft));
-            digitalWrite(g_amotors[2].DIR, cmd.m_nSpeedLeft < 0 ? LOW : HIGH);
-            analogWrite(g_amotors[2].POWER, abs(cmd.m_nSpeedLeft));
+            g_amotors[0].SetSpeed(cmd.m_nSpeedLeft);
+            g_amotors[2].SetSpeed(cmd.m_nSpeedLeft);
             // RIGHT MOTORS
-            digitalWrite(g_amotors[1].DIR, cmd.m_nSpeedRight < 0 ? LOW : HIGH);
-            analogWrite(g_amotors[1].POWER, abs(cmd.m_nSpeedRight));
-            digitalWrite(g_amotors[3].DIR, cmd.m_nSpeedRight < 0 ? LOW : HIGH);
-            analogWrite(g_amotors[3].POWER, abs(cmd.m_nSpeedRight));
+            g_amotors[1].SetSpeed(cmd.m_nSpeedRight);
+            g_amotors[3].SetSpeed(cmd.m_nSpeedRight);
             break;
             
         case ecmdSTOP:
-            for(int i=0; i<4; ++i) analogWrite(g_amotors[i].POWER, 0);
+            for(int i=0; i<4; ++i) g_amotors[i].SetSpeed(0);
             break;
             
         default: ;
     }
+}
+
+void SendSensorData() {
+    SSensorData data = {
+        g_nRoll, g_nPitch, g_nYaw,
+        g_amotors[0].Pop(),
+        g_amotors[1].Pop(),
+        g_amotors[2].Pop(),
+        g_amotors[3].Pop()
+    };
+    ble_write_bytes((byte*)&data, sizeof(data));
+    ble_do_events();
 }
 
 /*
@@ -163,17 +178,7 @@ static const unsigned long c_nTIMETOSTOP = 200; // ms
 
 void loop()
 {
-    if(updateAHRS()) {
-        SSensorData data = {
-            g_nRoll, g_nPitch, g_nYaw,
-            g_amotors[0].Pop(),
-            g_amotors[1].Pop(),
-            g_amotors[2].Pop(),
-            g_amotors[3].Pop()
-        };
-        ble_write_bytes((byte*)&data, sizeof(data));
-        ble_do_events();
-    }
+    bool bSendSensor = updateAHRS();
     
     if(ble_connected()!=g_bConnected) {
         g_bConnected=ble_connected();
@@ -194,6 +199,8 @@ void loop()
                 *pcmd = ble_read();
             }
             if(pcmd==pcmdEnd) {
+                // send current sensor data now, in case direction changes
+                bSendSensor = true;
                 g_nLastCommand = millis();
                 HandleCommand(cmd);
             } else {
@@ -204,10 +211,13 @@ void loop()
             
             ble_do_events();
             return;
-        } if(c_nTIMETOSTOP < millis()-g_nLastCommand) {
+        } else if(c_nTIMETOSTOP < millis()-g_nLastCommand) {
+            bSendSensor = true;
             SRobotCommand cmdStop = {ecmdSTOP, 0, 0};
             HandleCommand(cmdStop);
         }
+        
+        if(bSendSensor) SendSensorData();
     }
     
     ble_do_events();
