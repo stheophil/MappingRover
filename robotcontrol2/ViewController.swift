@@ -28,6 +28,9 @@ protocol RobotController {
 }
 
 class ViewController: NSViewController, RobotController {
+    let maxTurnSpeed : Int16 = 100
+    let maxFwdSpeed : Int16 = 200
+    
     // View interface
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,19 +60,19 @@ class ViewController: NSViewController, RobotController {
     }
     
     func moveForward() {
-        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: 255, m_nSpeedRight: 255))
+        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: maxFwdSpeed, m_nSpeedRight: maxFwdSpeed))
     }
     
     func moveBackward() {
-        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: -255, m_nSpeedRight: -255))
+        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: -maxFwdSpeed, m_nSpeedRight: -maxFwdSpeed))
     }
     
     func turnLeft() {
-        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: -255, m_nSpeedRight: 255))
+        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: -maxTurnSpeed, m_nSpeedRight: maxTurnSpeed))
     }
     
     func turnRight() {
-        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: 255, m_nSpeedRight: -255))
+        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: maxTurnSpeed, m_nSpeedRight: -maxTurnSpeed))
     }
     
     func receivedSensorData(data: SSensorData) {
@@ -109,8 +112,9 @@ class ViewController: NSViewController, RobotController {
     }
     
     func log(msg: String) {
-        textview.string? += msg
-        textview.scrollRangeToVisible(NSMakeRange(textview.string!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding), 0))
+        print(msg)
+        // textview.string? += msg
+        // textview.scrollRangeToVisible(NSMakeRange(textview.string!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding), 0))
     }
     
     var sensorDataArray = [(SSensorData, CGPoint)]() // sensor data including accumulated position

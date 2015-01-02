@@ -53,8 +53,11 @@ class QuartzView : NSView {
         }
 
         transform.concat()
-        let bPath = NSBezierPath(rect: NSMakeRect(-5.0, -5.0, 10.0, 10.0))
-        bPath.stroke()
+        NSBezierPath(rect: NSMakeRect(-5.0, -5.0, 10.0, 10.0)).stroke()
+        let path = NSBezierPath()
+        path.moveToPoint(NSMakePoint(7.5, 0))
+        path.lineToPoint(NSMakePoint(2.5, 0))
+        path.stroke()
     }
     
     override func keyDown(theEvent: NSEvent) {
