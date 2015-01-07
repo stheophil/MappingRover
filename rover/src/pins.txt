@@ -33,3 +33,9 @@ Gyro:
 TWI: 20 (SDA) and 21 (SCL). Support TWI communication using the Wire library. Note that these pins are not in the same location as the TWI pins on the Duemilanove or Diecimila
 
 20 (interrupt 3), and 21 (interrupt 2)
+
+Sonar
+=====
+
+Trigger: 27
+Echo (front): 29

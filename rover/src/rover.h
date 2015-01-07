@@ -8,7 +8,7 @@ enum ECommand { // force enum to be 4 bytes for Swift - AVR GCC interop
 
 struct SRobotCommand {
     enum ECommand m_cmd;
-    short m_nSpeedLeft;
+    short m_nSpeedLeft;     // max is 255, but leave some room for PID
     short m_nSpeedRight;
 };
 
@@ -16,6 +16,8 @@ struct SSensorData { // must be < 64 bytes
     short m_nPitch; // angles in 1/1000 radians
     short m_nRoll;
     short m_nYaw;
+    short m_nAngle; // sonar sensor angle
+    short m_nDistance; // in cm
     short m_anEncoderTicks[4];
 };
 

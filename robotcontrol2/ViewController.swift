@@ -40,7 +40,7 @@ class ViewController: NSViewController, RobotController {
         
         ble = BLE(controller: self)
         
-        assert(sizeof(SSensorData)==14)
+        assert(sizeof(SSensorData)==18)
         assert(sizeof(SRobotCommand)==8)
     }
     
@@ -82,12 +82,14 @@ class ViewController: NSViewController, RobotController {
             || data.m_anEncoderTicks.2 != 0
             || data.m_anEncoderTicks.3 != 0
         {
-            log("Sensor data Z: \(data.m_nYaw) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
+            log("Sensor data Z: \(data.m_nYaw) Sonar: \(data.m_nDistance) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
             
             // left motors are 0 and 2, right motors 1, 3
             // assert( sign(data.m_anEncoderTicks.0) == sign(data.m_anEncoderTicks.2) )
             // assert( sign(data.m_anEncoderTicks.1) == sign(data.m_anEncoderTicks.3) )
-            // TODO: assert that encoders are within certain error
+            
+            // TODO: Create path shape here
+            // TODO: Collapse turns into single point
             
             let ptPrev = sensorDataArray.last?.1 ?? CGPoint(x: 0, y: 0)
             var pt : CGPoint
