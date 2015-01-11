@@ -7,6 +7,7 @@
 #include "RBL_nRF8001.h"
 #include "PID_v1.h"
 
+// #define PID_TEST
 static const int MAX_SPEED = 500; // max encoder ticks per second
 
 struct SMotor {
@@ -47,7 +48,18 @@ struct SMotor {
         m_fSpeed = abs(nSpeed);
         m_bReverse = nSpeed < 0;
         digitalWrite(DIR, m_bReverse ? LOW : HIGH);
-        analogWrite(POWER, (int)m_fSpeed);
+    }
+    
+    void Stop(PID& pid) {
+        pid.SetMode(MANUAL);
+        SetSpeed(0);
+        
+        m_fPower = 0.0;
+        m_nTicksPID = 0;
+        m_nLastCompute = 0;
+        
+        analogWrite(POWER, 0);
+        pid.SetMode(AUTOMATIC);
     }
     
     bool ComputePID(PID& pid) {
@@ -73,6 +85,10 @@ struct SMotor {
         int nTick = m_nTicks;
         m_nTicks = 0;
         return nTick * (m_bReverse ? -1 : 1);
+    }
+    
+    float Current() const {
+        return analogRead(CURRENT) * 5.0 / 1023.0;
     }
 };
 
@@ -170,6 +186,20 @@ void OnDisconnection() {
 void HandleCommand(SRobotCommand const& cmd) {
     switch(cmd.m_cmd) {
         case ecmdMOVE:
+        {
+            bool bReverse = false;
+            for(int i=0; i<countof(g_amotors); ++i) {
+                int nSpeed = i%2==0 ? cmd.m_nSpeedLeft : cmd.m_nSpeedRight;
+                bReverse = bReverse || (nSpeed < 0 != g_amotors[i].m_bReverse);
+            }
+            if(bReverse) { // stop all motors and reset PID
+                Serial.println("STOP Motors");
+                for(int i=0; i<countof(g_amotors); ++i) {
+                    g_amotors[i].Stop(g_apid[i]);
+                }
+                delay(200);
+            }
+                
             // LEFT MOTORS:
             g_amotors[0].SetSpeed(constrain(cmd.m_nSpeedLeft, -MAX_SPEED, MAX_SPEED));
             g_amotors[2].SetSpeed(constrain(cmd.m_nSpeedLeft, -MAX_SPEED, MAX_SPEED));
@@ -177,9 +207,9 @@ void HandleCommand(SRobotCommand const& cmd) {
             g_amotors[1].SetSpeed(constrain(cmd.m_nSpeedRight, -MAX_SPEED, MAX_SPEED));
             g_amotors[3].SetSpeed(constrain(cmd.m_nSpeedRight, -MAX_SPEED, MAX_SPEED));
             break;
-            
+        }
         case ecmdSTOP:
-            for(int i=0; i<countof(g_amotors); ++i) g_amotors[i].SetSpeed(0);
+            for(int i=0; i<countof(g_amotors); ++i) g_amotors[i].Stop(g_apid[i]);
             break;
             
         default: ;
@@ -199,6 +229,8 @@ int g_iSonar = 0;
 void SendSensorData() {
     // TODO: Optimize order in which we accumulate sensor data
     // so sensor data is consistent with each other
+    // TODO: Transmit current or make emergency stop if motor current too high
+    
     int nDistance; // in cm
     int nAngle;
     {
@@ -210,7 +242,7 @@ void SendSensorData() {
         nAngle = g_asonar[g_iSonar].ANGLE;
         
         g_iSonar = (g_iSonar + 1) % countof(g_asonar);
-    } // ~ 20 ms
+    } // ~ 20 ms
     
     SSensorData data = {
         g_nRoll, g_nPitch, g_nYaw,
@@ -221,7 +253,6 @@ void SendSensorData() {
         g_amotors[3].Pop()
     };
     ble_write_bytes((byte*)&data, sizeof(data));
-    ble_do_events();
 }
 
 #ifdef PID_TEST
@@ -234,7 +265,7 @@ static const unsigned long c_nTIMETOSTOP = 200; // ms
 
 void loop()
 {
-    updateAHRS(); // ~ 4 ms, runs at 50 Hz
+    updateAHRS(); // ~ 4 ms, runs at 50 Hz
     
     if(ble_connected()!=g_bConnected) {
         g_bConnected=ble_connected();
@@ -266,7 +297,10 @@ void loop()
             SRobotCommand cmdStop = {ecmdSTOP, 0, 0};
             HandleCommand(cmdStop);
         }
-        SendSensorData(); // ~ 40 ms
+        for(int i=0; i<countof(g_amotors); ++i) {
+            g_amotors[i].ComputePID(g_apid[i]); // effective sample time ~ 130 ms
+        }
+        SendSensorData(); // ~ 40 ms
     }
     
     ble_do_events();

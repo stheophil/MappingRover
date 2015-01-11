@@ -28,8 +28,8 @@ protocol RobotController {
 }
 
 class ViewController: NSViewController, RobotController {
-    let maxTurnSpeed : Int16 = 100
-    let maxFwdSpeed : Int16 = 200
+    let maxTurnSpeed : Int16 = 200
+    let maxFwdSpeed : Int16 = 300
     
     // View interface
     override func viewDidLoad() {

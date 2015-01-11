@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		9E07040B1A628B4A003B497D /* lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lib; sourceTree = "<group>"; };
 		9ED4BB661A45867F00CD2D9C /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -14,6 +15,7 @@
 		9E05EC0A1A2E34D800161CE8 = {
 			isa = PBXGroup;
 			children = (
+				9E07040B1A628B4A003B497D /* lib */,
 				9ED4BB661A45867F00CD2D9C /* src */,
 			);
 			sourceTree = "<group>";
