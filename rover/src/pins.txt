@@ -22,8 +22,8 @@ Encoder Inputs:
 
 Motor 1: 2 (interrupt 0), 32, 34
 Motor 2: 3 (interrupt 1), 36, 38
-Motor 3: 18 (interrupt 5), 40, 42
-Motor 4: 19 (interrupt 4), 44, 46
+Motor 3: 18 (interrupt 4), 40, 42
+Motor 4: 19 (interrupt 5), 44, 46
 
 (1000 state changes per three wheel rotations)
 

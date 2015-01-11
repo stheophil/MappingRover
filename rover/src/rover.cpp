@@ -5,6 +5,9 @@
 #include "SPI.h"
 #include "boards.h"
 #include "RBL_nRF8001.h"
+#include "PID_v1.h"
+
+static const int MAX_SPEED = 500; // max encoder ticks per second
 
 struct SMotor {
     const int POWER;
@@ -15,11 +18,6 @@ struct SMotor {
     const int ENC1;
     const int ENC2;
     
-    // boost in %. A very poor man's PID. Insufficient unfortunately.
-    // The motor error depends on the speed and the direction.
-    // See motor measurement xls
-    const float FACTOR;
-    
     void setup() {
         pinMode(POWER, OUTPUT);
         pinMode(DIR, OUTPUT);
@@ -29,35 +27,74 @@ struct SMotor {
         pinMode(ENC2, INPUT);
         
         m_nTicks = 0;
+        m_bReverse = false;
+        
+        m_nLastCompute = 0;
+        m_fSpeed = 0.0;
+        m_fTicksPerSecond = 0.0;
+        m_fPower = 0.0;
     }
     
-    int m_nSpeed;
+    double m_fSpeed; // pid set point == desired ticks per second
+    double m_fTicksPerSecond; // pid input
+    double m_fPower; // pid output in [0, 255]
+    
+    unsigned long m_nLastCompute;
+    int m_nTicksPID;
+    
+    bool m_bReverse;
     void SetSpeed(int nSpeed) {
-        m_nSpeed = nSpeed;
-        digitalWrite(DIR, m_nSpeed < 0 ? LOW : HIGH);
-        
-        int nSpeedAdj = (int)(abs(m_nSpeed) * FACTOR + (m_nSpeed < 0 ? -0.5 : 0.5));
-        analogWrite(POWER, nSpeedAdj);
+        m_fSpeed = abs(nSpeed);
+        m_bReverse = nSpeed < 0;
+        digitalWrite(DIR, m_bReverse ? LOW : HIGH);
+        analogWrite(POWER, (int)m_fSpeed);
+    }
+    
+    bool ComputePID(PID& pid) {
+        unsigned long nNow = millis();
+        unsigned long nChange = nNow - m_nLastCompute;
+        m_fTicksPerSecond = m_nTicksPID / (nChange / 1000.0);
+        if(pid.Compute()) { // is the sample time low enough?
+            m_nTicksPID = 0;
+            m_nLastCompute = nNow;
+            analogWrite(POWER, (int)m_fPower);
+            return true;
+        }
+        return false;
     }
     
     int m_nTicks;
     void onInterrupt() {
         ++m_nTicks;
+        ++m_nTicksPID;
     }
     
     int Pop() {
         int nTick = m_nTicks;
         m_nTicks = 0;
-        return nTick * (m_nSpeed < 0 ? -1 : 1);
+        return nTick * (m_bReverse ? -1 : 1);
     }
 };
 
 SMotor g_amotors[] = {
     // See pins.txt
-    {4, 33, 35, 0, 32, 34, 1.031},
-    {5, 37, 39, 1, 36, 38, 1.0},
-    {6, 41, 43, 5, 40, 42, 1.0},
-    {7, 45, 47, 4, 44, 46, 1.046}
+    {4, 33, 35, 0, 32, 34},
+    {5, 37, 39, 1, 36, 38},
+    {6, 41, 43, 4, 40, 42},
+    {7, 45, 47, 5, 44, 46}
+};
+
+// PID ctor expects double pointer, can't make it member of SMotor
+// TODO: http://robotics.stackexchange.com/questions/167/what-are-good-strategies-for-tuning-pid-loops
+static const double c_fCoeffP = 0.2;
+static const double c_fCoeffI = 0.7;
+static const double c_fCoeffD = 0.0;
+
+PID g_apid[] = {
+    PID(&g_amotors[0].m_fTicksPerSecond, &g_amotors[0].m_fPower, &g_amotors[0].m_fSpeed, c_fCoeffP, c_fCoeffI, c_fCoeffD, DIRECT),
+    PID(&g_amotors[1].m_fTicksPerSecond, &g_amotors[1].m_fPower, &g_amotors[1].m_fSpeed, c_fCoeffP, c_fCoeffI, c_fCoeffD, DIRECT),
+    PID(&g_amotors[2].m_fTicksPerSecond, &g_amotors[2].m_fPower, &g_amotors[2].m_fSpeed, c_fCoeffP, c_fCoeffI, c_fCoeffD, DIRECT),
+    PID(&g_amotors[3].m_fTicksPerSecond, &g_amotors[3].m_fPower, &g_amotors[3].m_fSpeed, c_fCoeffP, c_fCoeffI, c_fCoeffD, DIRECT)
 };
 
 void OnMotor0Interrupt() { g_amotors[0].onInterrupt(); }
@@ -108,10 +145,10 @@ void setup()
     
     // Motor setup
     for(int i=0; i<countof(g_amotors); ++i) {
-      g_amotors[i].setup();
-      attachInterrupt(g_amotors[i].ENCODER_IRQ, c_afnInterrupts[i], CHANGE);
+        g_amotors[i].setup();
+        attachInterrupt(g_amotors[i].ENCODER_IRQ, c_afnInterrupts[i], CHANGE);
     }
-   
+    
     // AHRS
     setupAHRS();
     
@@ -134,11 +171,11 @@ void HandleCommand(SRobotCommand const& cmd) {
     switch(cmd.m_cmd) {
         case ecmdMOVE:
             // LEFT MOTORS:
-            g_amotors[0].SetSpeed(cmd.m_nSpeedLeft);
-            g_amotors[2].SetSpeed(cmd.m_nSpeedLeft);
+            g_amotors[0].SetSpeed(constrain(cmd.m_nSpeedLeft, -MAX_SPEED, MAX_SPEED));
+            g_amotors[2].SetSpeed(constrain(cmd.m_nSpeedLeft, -MAX_SPEED, MAX_SPEED));
             // RIGHT MOTORS
-            g_amotors[1].SetSpeed(cmd.m_nSpeedRight);
-            g_amotors[3].SetSpeed(cmd.m_nSpeedRight);
+            g_amotors[1].SetSpeed(constrain(cmd.m_nSpeedRight, -MAX_SPEED, MAX_SPEED));
+            g_amotors[3].SetSpeed(constrain(cmd.m_nSpeedRight, -MAX_SPEED, MAX_SPEED));
             break;
             
         case ecmdSTOP:
@@ -187,38 +224,9 @@ void SendSensorData() {
     ble_do_events();
 }
 
-/*
-void MeasurementLoop() {
-    OnConnection();
-    
-    int anTicks[80] = {0};
-    SRobotCommand cmd = {ecmdMOVE, 255, 255};
-    HandleCommand(cmd);
-    
-    for(int iTick=0; iTick<20; ++iTick) {
-        delay(50);
-        
-        for(int i=0; i<4; ++i) {
-            anTicks[iTick * 4 + i] = g_amotors[i].m_cTicks;
-        }
-    }
-    
-    SRobotCommand cmdStop = {ecmdSTOP, 0, 0};
-    HandleCommand(cmdStop);
-    
-    Serial.println("Motor encoder counts");
-    
-    for(int iTick=0; iTick<20; ++iTick) {
-        for(int i=0; i<4; ++i) {
-            Serial.print(anTicks[iTick * 4 + i]);
-            Serial.print(",");
-        }
-        Serial.println("");
-    }
-    
-    delay(100000);
-}
-*/
+#ifdef PID_TEST
+#include "pidtest.h"
+#else
 
 bool g_bConnected = false;
 unsigned long g_nLastCommand = 0;
@@ -247,7 +255,6 @@ void loop()
                 *pcmd = ble_read();
             }
             if(pcmd==pcmdEnd) {
-                // send current sensor data now, in case direction changes
                 g_nLastCommand = millis();
                 HandleCommand(cmd);
             } else {
@@ -264,3 +271,4 @@ void loop()
     
     ble_do_events();
 }
+#endif
