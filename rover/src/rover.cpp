@@ -16,16 +16,11 @@ struct SMotor {
     const int CURRENT;
     
     const int ENCODER_IRQ; // Interrupt, not PIN
-    const int ENC1;
-    const int ENC2;
     
     void setup() {
         pinMode(POWER, OUTPUT);
         pinMode(DIR, OUTPUT);
         pinMode(CURRENT, INPUT);
-        
-        pinMode(ENC1, INPUT);
-        pinMode(ENC2, INPUT);
         
         m_nTicks = 0;
         m_bReverse = false;
@@ -94,10 +89,10 @@ struct SMotor {
 
 SMotor g_amotors[] = {
     // See pins.txt
-    {4, 33, 35, 0, 32, 34},
-    {5, 37, 39, 1, 36, 38},
-    {6, 41, 43, 4, 40, 42},
-    {7, 45, 47, 5, 44, 46}
+    {4, 33, 35, 0},
+    {5, 37, 39, 1},
+    {6, 41, 43, 4},
+    {7, 45, 47, 5}
 };
 
 // PID ctor expects double pointer, can't make it member of SMotor
@@ -125,12 +120,15 @@ void (*c_afnInterrupts[4])() = {
 #define RELAY_PIN 10
 
 struct SSonar {
-    const int TRIGGER;
     const int ECHO;
+    const int TRIGGER;
     const int ANGLE; // 0: front, 90: left, -90 right
 };
+
 SSonar g_asonar[] = {
-    { 27, 29, 0 }
+    { 32, 34, 90 },
+    { 36, 38, 0 },
+    { 40, 42, -90 }
 };
 
 #define countof(a) (sizeof(a)/sizeof(a[0]))

@@ -82,7 +82,7 @@ class ViewController: NSViewController, RobotController {
             || data.m_anEncoderTicks.2 != 0
             || data.m_anEncoderTicks.3 != 0
         {
-            log("Sensor data Z: \(data.m_nYaw) Sonar: \(data.m_nDistance) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
+            log("Sensor data Z: \(data.m_nYaw) Sonar: \(data.m_nDistance) @ \(data.m_nAngle) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
             
             // left motors are 0 and 2, right motors 1, 3
             // assert( sign(data.m_anEncoderTicks.0) == sign(data.m_anEncoderTicks.2) )

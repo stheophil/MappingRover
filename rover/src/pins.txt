@@ -20,10 +20,10 @@ Motor Relay
 Encoder Inputs:
 ====================
 
-Motor 1: 2 (interrupt 0), 32, 34
-Motor 2: 3 (interrupt 1), 36, 38
-Motor 3: 18 (interrupt 4), 40, 42
-Motor 4: 19 (interrupt 5), 44, 46
+Motor 1: 2 (interrupt 0),
+Motor 2: 3 (interrupt 1),
+Motor 3: 18 (interrupt 4),
+Motor 4: 19 (interrupt 5),
 
 (1000 state changes per three wheel rotations)
 
@@ -37,5 +37,6 @@ TWI: 20 (SDA) and 21 (SCL). Support TWI communication using the Wire library. No
 Sonar
 =====
 
-Trigger: 27
-Echo (front): 29
+Left: Echo: 32 Trigger: 34
+Front: Echo: 36 Trigger: 38
+Right: Echo: 40 Trigger: 42
