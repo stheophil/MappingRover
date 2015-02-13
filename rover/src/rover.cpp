@@ -8,6 +8,7 @@
 #include "PID_v1.h"
 
 // #define PID_TEST
+// #define CALIBRATE
 static const int MAX_SPEED = 500; // max encoder ticks per second
 
 struct SMotor {
@@ -255,6 +256,8 @@ void SendSensorData() {
 
 #ifdef PID_TEST
 #include "pidtest.h"
+#else if CALIBRATE
+#include "calibrate.h"
 #else
 
 bool g_bConnected = false;

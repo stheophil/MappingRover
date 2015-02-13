@@ -63,7 +63,7 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         didDiscoverServices error: NSError!)
     {
         assert(error==nil)
-        assert(peripheralActive!.services.count==1)
+        // assert(peripheralActive!.services.count==1)
         
         for service in peripheralActive!.services {
             println("Discovered service \((service as CBService).UUID.UUIDString)")

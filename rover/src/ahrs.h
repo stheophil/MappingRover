@@ -17,4 +17,7 @@ extern int g_nRoll;
 extern int g_nPitch;
 extern int g_nYaw;
 
+extern L3G gyro;
+extern LSM303 compass;
+
 #endif /* defined(____ahrs__) */

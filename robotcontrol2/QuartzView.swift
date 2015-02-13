@@ -9,16 +9,10 @@
 import Foundation
 import Cocoa
 
-func yawToRadians(yaw: Int16) -> Double {
-     return Double(-yaw)/1000.0
-}
-
 class QuartzView : NSView {
-    let centimetersPerPoint = 2
-    let wheelRadius = 3 // cm
+    let centimetersPerPoint = 1
     
-    override func drawRect(dirtyRect: NSRect) {        
-        //       println(dirtyRect)
+    override func drawRect(dirtyRect: NSRect) {
         let background = NSBezierPath(rect: self.bounds)
         let black = NSColor.blackColor()
         black.set()
@@ -28,36 +22,33 @@ class QuartzView : NSView {
         fillColor.set()
         
         let sensordata = controller.sensorData()
-        let fYaw = sensordata.isEmpty ? 0.0 : yawToRadians(sensordata.last!.0.m_nYaw)
+        let fYaw = yawToRadians(sensordata.last?.0.m_nYaw ?? 0)
         let ptLast = sensordata.last?.1 ?? CGPointZero
         
-        var transform = NSAffineTransform()
-        var transformPath = NSAffineTransform()
+        // TODO: Always unscaled
+        let sizeImage = controller.occupancy().size
+        controller.occupancy().drawInRect(NSRect(
+            x: self.bounds.width/2 - ptLast.x - sizeImage.width/2,
+            y: self.bounds.height/2 - ptLast.y + sizeImage.height/2,
+            width: sizeImage.width,
+            height: -sizeImage.height
+        ))
         
+        var transformPath = NSAffineTransform()
+        transformPath.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
+        // transformPath.scaleBy(CGFloat(1.0 / Double(centimetersPerPoint))) // 1000 encoders ticks = 3 rotations
+        transformPath.translateXBy(-ptLast.x, yBy: -ptLast.y)
+        transformPath.transformBezierPath(controller.path()).stroke()
+        
+        var transform = NSAffineTransform()
         transform.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
+        // transform.scaleBy(CGFloat(1.0 / Double(centimetersPerPoint)))
         transform.rotateByRadians(CGFloat(fYaw))
         
-        transformPath.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
-        transformPath.scaleBy(CGFloat(6.0 * M_PI * Double(wheelRadius) / 1000.0 / Double(centimetersPerPoint))) // 1000 encoders ticks = 3 rotations
-        transformPath.translateXBy(-ptLast.x, yBy: -ptLast.y)
-        
-        var ptPrev = transformPath.transformPoint(CGPointZero)
-        for (_, pt) in sensordata {
-            let path = NSBezierPath()
-            let ptScaled = transformPath.transformPoint(pt)
-            path.moveToPoint(ptPrev)
-            path.lineToPoint(ptScaled)
-            path.stroke()
-            
-            ptPrev = ptScaled
-        }
-
-        transform.concat()
-        NSBezierPath(rect: NSMakeRect(-5.0, -5.0, 10.0, 10.0)).stroke()
-        let path = NSBezierPath()
-        path.moveToPoint(NSMakePoint(7.5, 0))
-        path.lineToPoint(NSMakePoint(2.5, 0))
-        path.stroke()
+        var outline = NSBezierPath(rect: NSMakeRect(-5.0, -5.0, 10.0, 10.0))
+        outline.moveToPoint(NSMakePoint(7.5, 0))
+        outline.lineToPoint(NSMakePoint(2.5, 0))
+        transform.transformBezierPath(outline).stroke()
     }
     
     override func keyDown(theEvent: NSEvent) {
