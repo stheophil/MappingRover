@@ -9,6 +9,7 @@ void loop() {
         for(int i=0; i<countof(g_amotors); ++i) {
             analogWrite(g_amotors[i].POWER, 128);
         }
+        bFirstRun = false;
     } else {
         compass.read();
         

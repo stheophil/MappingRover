@@ -17,6 +17,9 @@ extern int g_nRoll;
 extern int g_nPitch;
 extern int g_nYaw;
 
+#include "L3G.h"
+#include "LSM303.h"
+
 extern L3G gyro;
 extern LSM303 compass;
 

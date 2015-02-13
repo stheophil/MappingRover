@@ -254,9 +254,9 @@ void SendSensorData() {
     ble_write_bytes((byte*)&data, sizeof(data));
 }
 
-#ifdef PID_TEST
+#if defined(PID_TEST)
 #include "pidtest.h"
-#else if CALIBRATE
+#elif defined(CALIBRATE)
 #include "calibrate.h"
 #else
 
