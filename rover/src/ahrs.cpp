@@ -73,13 +73,12 @@ int SENSOR_SIGN[9] = {1,1,1,-1,-1,-1,1,1,1}; //Correct directions x,y,z - gyro, 
 
 // LSM303 magnetometer calibration constants; use the Calibrate example from
 // the Pololu LSM303 library to find the right values for your board
-
-#define M_X_MIN -2864
-#define M_Y_MIN -3069
-#define M_Z_MIN -1622
-#define M_X_MAX 2855
-#define M_Y_MAX 2939
-#define M_Z_MAX 4297
+#define M_X_MIN -2942
+#define M_Y_MIN -2995
+#define M_Z_MIN -1628
+#define M_X_MAX 3086
+#define M_Y_MAX 2941
+#define M_Z_MAX 4307
 
 #define Kp_ROLLPITCH 0.02
 #define Ki_ROLLPITCH 0.00002

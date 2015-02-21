@@ -9,6 +9,8 @@
 
 // #define PID_TEST
 // #define CALIBRATE
+// #define AHRS_TEST
+
 static const int MAX_SPEED = 500; // max encoder ticks per second
 
 struct SMotor {
@@ -258,6 +260,8 @@ void SendSensorData() {
 #include "pidtest.h"
 #elif defined(CALIBRATE)
 #include "calibrate.h"
+#elif defined(AHRS_TEST)
+#include "ahrs_test.h"
 #else
 
 bool g_bConnected = false;

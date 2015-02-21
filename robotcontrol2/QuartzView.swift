@@ -25,9 +25,8 @@ class QuartzView : NSView {
         let fYaw = yawToRadians(sensordata.last?.0.m_nYaw ?? 0)
         let ptLast = sensordata.last?.1 ?? CGPointZero
         
-        // TODO: Always unscaled
-        let sizeImage = controller.occupancy().size
-        controller.occupancy().drawInRect(NSRect(
+        let sizeImage = controller.occupancy().image.size * controller.occupancy().scale
+        controller.occupancy().image.drawInRect(NSRect(
             x: self.bounds.width/2 - ptLast.x - sizeImage.width/2,
             y: self.bounds.height/2 - ptLast.y + sizeImage.height/2,
             width: sizeImage.width,
