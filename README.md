@@ -8,6 +8,8 @@ To build the project you need the [L3G](https://github.com/pololu/l3g-arduino), 
 
 ## The Mac Application
 
-The Mac app receives sensor data from the rover and sends control commands to the vehicle. It builds a [probabilistic occupancy grid map](http://en.wikipedia.org/wiki/Occupancy_grid_mapping) from the sensor data:
+The Mac app receives sensor data from the rover and sends control commands to the vehicle. It builds a (still pretty rough) [probabilistic occupancy grid map](http://en.wikipedia.org/wiki/Occupancy_grid_mapping) from the sensor data:
 
 ![Annotated occupancy grid](https://raw.githubusercontent.com/stheophil/MappingRover/master/example_map.png)
+
+The implementation is based on the description in [_Thrun, S., Burgard, W. and Fox, D. (2005). Probabilistic Robotics. Cambridge, Mass: MIT Press_](http://www.probabilistic-robotics.org)
