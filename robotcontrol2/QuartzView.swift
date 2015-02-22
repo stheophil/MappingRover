@@ -12,42 +12,44 @@ import Cocoa
 class QuartzView : NSView {
     let centimetersPerPoint = 1
     
+    func withGraphicsState( function : () -> () ) {
+        NSGraphicsContext.saveGraphicsState()
+        function()
+        NSGraphicsContext.restoreGraphicsState()
+    }
+    
     override func drawRect(dirtyRect: NSRect) {
         let background = NSBezierPath(rect: self.bounds)
         let black = NSColor.blackColor()
         black.set()
         background.fill()
         
-        let fillColor = NSColor.whiteColor()
+        let fillColor = NSColor.redColor()
         fillColor.set()
         
         let sensordata = controller.sensorData()
         let fYaw = yawToRadians(sensordata.last?.0.m_nYaw ?? 0)
         let ptLast = sensordata.last?.1 ?? CGPointZero
         
-        let sizeImage = controller.occupancy().image.size * controller.occupancy().scale
-        controller.occupancy().image.drawInRect(NSRect(
-            x: self.bounds.width/2 - ptLast.x - sizeImage.width/2,
-            y: self.bounds.height/2 - ptLast.y + sizeImage.height/2,
-            width: sizeImage.width,
-            height: -sizeImage.height
-        ))
+        withGraphicsState() {
+            var transform = NSAffineTransform()
+            transform.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
+            transform.translateXBy(-ptLast.x, yBy: -ptLast.y)
+            transform.concat()
+            
+            self.controller.occupancy().draw()
+            self.controller.path().stroke()
+        }
         
-        var transformPath = NSAffineTransform()
-        transformPath.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
-        // transformPath.scaleBy(CGFloat(1.0 / Double(centimetersPerPoint))) // 1000 encoders ticks = 3 rotations
-        transformPath.translateXBy(-ptLast.x, yBy: -ptLast.y)
-        transformPath.transformBezierPath(controller.path()).stroke()
-        
-        var transform = NSAffineTransform()
-        transform.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
-        // transform.scaleBy(CGFloat(1.0 / Double(centimetersPerPoint)))
-        transform.rotateByRadians(CGFloat(fYaw))
+        // Draw robot outline rotated by fYaw
+        var transformRotate = NSAffineTransform()
+        transformRotate.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
+        transformRotate.rotateByRadians(CGFloat(fYaw))
         
         var outline = NSBezierPath(rect: NSMakeRect(-5.0, -5.0, 10.0, 10.0))
         outline.moveToPoint(NSMakePoint(7.5, 0))
         outline.lineToPoint(NSMakePoint(2.5, 0))
-        transform.transformBezierPath(outline).stroke()
+        transformRotate.transformBezierPath(outline).stroke()
     }
     
     override func keyDown(theEvent: NSEvent) {

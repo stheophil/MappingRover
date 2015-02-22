@@ -31,7 +31,7 @@ protocol RobotController {
 }
 
 // Robot configuration. Needs calibration.
-let wheelRadius = CGFloat(3) // cm
+let wheelRadius = CGFloat(6) // cm
 // TODO: robot dimensions, sensor x-y offset
 let sonarMaxDistance = CGFloat(300.0) // cm = Sonar max distance depends on mounting height
 let sonarOpeningAngle = CGFloat(M_PI_2 / 6) // 15 degrees = Sensor opening angle
@@ -47,7 +47,7 @@ func yawToRadians(yaw: Int16) -> CGFloat {
 
 class ViewController: NSViewController, RobotController {
     let maxTurnSpeed : Int16 = 200
-    let maxFwdSpeed : Int16 = 300
+    let maxFwdSpeed : Int16 = 200
     
     // View interface
     override func viewDidLoad() {

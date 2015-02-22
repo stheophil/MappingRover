@@ -135,7 +135,7 @@ class OccupancyGrid {
                         if distance < CGFloat(nDistance) - sonarDistanceTolerance/2 {
                             inverseSensorModel = -0.5 // free
                         } else {
-                            inverseSensorModel = 0.5 // occupied
+                            inverseSensorModel =  100.0 / Double(distance)  // occupied
                         }
                         grid[x][y] = grid[x][y] + inverseSensorModel // - prior which is 0
                         
@@ -148,6 +148,16 @@ class OccupancyGrid {
         }
         
         // TODO: update occgrid points that collide with robot to probability 0
+    }
+    
+    func draw() {
+        let sizeImage = image.size * scale
+        image.drawInRect(NSRect(
+            x: -sizeImage.width/2,
+            y: sizeImage.height/2,
+            width: sizeImage.width,
+            height: -sizeImage.height
+            ))
     }
     
     let extent = 1000
