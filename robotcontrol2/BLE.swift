@@ -66,8 +66,8 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         // assert(peripheralActive!.services.count==1)
         
         for service in peripheralActive!.services {
-            println("Discovered service \((service as CBService).UUID.UUIDString)")
-            peripheralActive!.discoverCharacteristics(nil, forService: service as CBService)
+            println("Discovered service \((service as! CBService).UUID.UUIDString)")
+            peripheralActive!.discoverCharacteristics(nil, forService: service as! CBService)
         }
     }
     
@@ -78,14 +78,14 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         assert(error==nil)
         assert(service.characteristics.count==2)
         for characteristic in service.characteristics {
-            println("Discovered characteristic \((characteristic as CBCharacteristic).UUID.UUIDString)")
-            if (characteristic as CBCharacteristic).UUID.UUIDString == UUID_TX_CHARACTERISTICS.UUIDString {
+            println("Discovered characteristic \((characteristic as! CBCharacteristic).UUID.UUIDString)")
+            if (characteristic as! CBCharacteristic).UUID.UUIDString == UUID_TX_CHARACTERISTICS.UUIDString {
                 println("TX Characteristics found")
-                charTX = characteristic as CBCharacteristic
+                charTX = characteristic as! CBCharacteristic
             } else {
-                assert( (characteristic as CBCharacteristic).UUID.UUIDString == UUID_RX_CHARACTERISTICS.UUIDString )
+                assert( (characteristic as! CBCharacteristic).UUID.UUIDString == UUID_RX_CHARACTERISTICS.UUIDString )
                 println("RX Characteristics found")
-                charRX = characteristic as CBCharacteristic
+                charRX = characteristic as! CBCharacteristic
                 
                 peripheralActive!.setNotifyValue(true, forCharacteristic: charRX)
             }

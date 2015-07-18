@@ -8,10 +8,6 @@
 
 import Cocoa
 
-func sign<T : IntegerType>(x : T) -> Int {
-    return x < 0 ? -1 : (0 < x ? 1 : 0)
-}
-
 protocol RobotController {
     // Robot control
     func moveForward()
@@ -32,7 +28,13 @@ protocol RobotController {
 
 // Robot configuration. Needs calibration.
 let wheelRadius = CGFloat(6) // cm
-// TODO: robot dimensions, sensor x-y offset
+let robotSize = CGSize(width: 30, height: 30) // cm
+let anSonarOffset = [6, 7, 2] // cm for -90, 0, 90 Angle
+func sonarOffset(nAngle: Int16) -> Int {
+    assert(nAngle==0 || abs(nAngle)==90)
+    return anSonarOffset[sign(nAngle) + 1]
+}
+
 let sonarMaxDistance = CGFloat(300.0) // cm = Sonar max distance depends on mounting height
 let sonarOpeningAngle = CGFloat(M_PI_2 / 6) // 15 degrees = Sensor opening angle
 let sonarDistanceTolerance = CGFloat(5.0)
@@ -119,7 +121,7 @@ class ViewController: NSViewController, RobotController {
             // position does not change
             pt = ptPrev
         } else {
-            pt = toPoint(yawToRadians(data.m_nYaw), encoderTicksToCm(data.m_anEncoderTicks.0))
+            pt = CGPoint(fromAngle: yawToRadians(data.m_nYaw), distance: encoderTicksToCm(data.m_anEncoderTicks.0))
             pt.x += ptPrev.x
             pt.y += ptPrev.y
             
@@ -128,7 +130,8 @@ class ViewController: NSViewController, RobotController {
         sensorDataArray.append((data, pt))
         viewRender.needsDisplay = true
         
-        occgrid.update(pt, fYaw: yawToRadians(data.m_nYaw), nAngle: data.m_nAngle, nDistance: data.m_nDistance)
+        occgrid.update(pt, fYaw: yawToRadians(data.m_nYaw), nAngle: data.m_nAngle, nDistance: data.m_nDistance + sonarOffset(data.m_nAngle))
+        // TODO: Clear rotated rect occupied by robot at pt
     }
     
     func sensorData() -> [(SSensorData, CGPoint)] {
