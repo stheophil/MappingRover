@@ -138,6 +138,12 @@ extension CGPoint : ScalableOffsetable {
             : (y < 0 ? 3 : 0)
     }
     
+    func rotated(fAngle: CGFloat) -> CGPoint {
+        let c = cos(fAngle)
+        let s = sin(fAngle)
+        return CGPoint(x: x * c - y * s, y: x * s + y * c)
+    }
+    
     // < 0 -> v is left of this
     // > 0 -> v is right of this
     func compare(v: CGPoint) -> Int {
@@ -146,18 +152,25 @@ extension CGPoint : ScalableOffsetable {
     }
 }
 
+func RectFromPoints(points: [CGPoint]) -> (CGPoint, CGSize) {
+    let bottomLeft = CGPoint(
+        x: minElement(points.map{ $0.x }),
+        y: minElement(points.map{ $0.y })
+    )
+    let topRight = CGPoint(
+        x: maxElement(points.map{ $0.x }),
+        y: maxElement(points.map{ $0.y })
+    )
+    return (bottomLeft, CGSize(topRight - bottomLeft))
+}
+
 extension CGRect : ScalableOffsetable {
     init(fromPoints points: CGPoint...) {
-        let bottomLeft = CGPoint(
-            x: minElement(points.map{ $0.x }),
-            y: minElement(points.map{ $0.y })
-        )
-        let topRight = CGPoint(
-            x: maxElement(points.map{ $0.x }),
-            y: maxElement(points.map{ $0.y })
-        )
-        origin = bottomLeft
-        size = CGSize(topRight - bottomLeft)
+        (origin, size) = RectFromPoints(points)
+    }
+    
+    init(fromPoints points: [CGPoint]) {
+        (origin, size) = RectFromPoints(points)
     }
     
     init(centeredAt pt: CGPoint, size: CGSize) {
@@ -210,24 +223,93 @@ struct SArc {
             }
         }
         
-        rectBound.integerize()
         let fSqrRadius = CGFloat(radius * radius)
-        for y in Int(rectBound.minY) ... Int(rectBound.maxY) {
+        for y in Int(floor(rectBound.minY)) ... Int(floor(rectBound.maxY)) {
             var bFoundPointsInLine = false
-            for x in Int(rectBound.minX) ... Int(rectBound.maxX) {
+            for x in Int(floor(rectBound.minX)) ... Int(floor(rectBound.maxX)) {
                 let pt = CGPoint(x: x, y: y)
                 let fSqrDistance = pt.SqrAbs()
                 
                 if fSqrDistance < fSqrRadius
-                && 0<ptFrom.compare(pt)
-                && 0<pt.compare(ptTo) {
+                && 0<=ptFrom.compare(pt) // this is very strict and does not
+                && 0<=pt.compare(ptTo) { // count grid cells partially inside arc
                     bFoundPointsInLine = true
                
-                    foreach(x + Int(ptCenter.x), y + Int(ptCenter.y), fSqrDistance)
+                    foreach(x + Int(floor(ptCenter.x)), y + Int(floor(ptCenter.y)), fSqrDistance)
                     
                 } else if bFoundPointsInLine {
                     break // go to next line
                 }
+            }
+        }
+    }
+}
+
+struct SRotatedRect {
+    var ptCenter : CGPoint
+    var size : CGSize
+    var fAngle : CGFloat
+    
+    func forEachPoint(foreach : (Int, Int) -> Void) {
+        let apt = [
+            CGPoint(x: -size.width/2, y: -size.height/2).rotated(fAngle) + CGVector(ptCenter),
+            CGPoint(x: size.width/2, y: -size.height/2).rotated(fAngle) + CGVector(ptCenter),
+            CGPoint(x: size.width/2, y: size.height/2).rotated(fAngle) + CGVector(ptCenter),
+            CGPoint(x: -size.width/2, y: size.height/2).rotated(fAngle) + CGVector(ptCenter)
+        ]
+        
+        func rasterize(var ptA: CGPoint, var ptB: CGPoint, f : (Int, Int) -> Void) {
+            if(ptB.x<ptA.x) {
+                swap(&ptB, &ptA)
+            }
+            
+            // Always round down instead of rounding to nearest
+            // if ptA.x == 10.6, it occupies grid cell 10
+            let nBegin = Int(floor(ptA.x))
+            let nEnd = Int(floor(ptB.x))
+            
+            if(nBegin == nEnd) {
+                // straight vertical line
+                let nBeginY = Int( floor(min(ptA.y, ptB.y)) )
+                let nEndY = Int( floor(max(ptA.y, ptB.y)) )
+                for y in nBeginY ... nEndY {
+                    f(nBegin, y)
+                }
+            } else {
+                let m : CGFloat = (ptB.y - ptA.y) / (ptB.x - ptA.x)
+                if(abs(m)<=1) { // x-step
+                    for x in nBegin ... nEnd {
+                        f(x, Int(floor(ptA.y + m * CGFloat(x - nBegin))))
+                    }
+                } else { // y-step
+                    if(ptB.y < ptA.y) {
+                        swap(&ptB, &ptA);
+                    }
+                    let nBeginY = Int( floor(ptA.y) )
+                    let nEndY = Int( floor(ptB.y) )
+                    
+                    for y in nBeginY ... nEndY {
+                        f(Int(floor(ptA.x + CGFloat(y - nBeginY) / m)), y)
+                    }
+                }
+            }
+        }
+        
+        // TODO: The map could be avoided by sorting the line segments
+        var dictMinMaxX = [Int: (Int, Int)]()
+        for i in 0 ..< apt.count {
+            rasterize(apt[i], apt[(i+1)%apt.count], { (x: Int, y: Int) -> Void in
+                if let pairMinMax = dictMinMaxX[y] {
+                    dictMinMaxX[y] = (min(pairMinMax.0, x), max(pairMinMax.1, x))
+                } else {
+                    dictMinMaxX[y] = (x, x)
+                }
+            })
+        }
+        
+        for (y, pairMinMaxX) in dictMinMaxX {
+            for x in pairMinMaxX.0 ... pairMinMaxX.1 {
+                foreach(x, y)
             }
         }
     }
@@ -281,21 +363,18 @@ class OccupancyGrid {
                 self.setGrid(x, y, self.grid[x][y] + fInverseSensorModel) // - prior which is 0
             }
         })
+        
+        // Clear position of robot itself
+        let rectRobot = SRotatedRect(ptCenter: transform(pt), size: robotSize/scale, fAngle: fYaw)
+        rectRobot.forEachPoint({ (x: Int, y:Int) -> Void in
+            self.setGrid(x, y, -100)
+        })
     }
     
     func setGrid(x: Int, _ y: Int, _ value: Double) {
         grid[x][y] = value
-        var color = Int( 1 / ( 1 + exp( value ))  * 255)
+        var color = Int(round(1 / ( 1 + exp( value ))  * 255))
         image.setPixel(&color, atX: x, y: y)
-    }
-    
-    func clear(rect: CGRect) {
-        let rectGrid = transform(rect)
-        for y in Int(rectGrid.minY) ... Int(rectGrid.maxY) {
-            for x in Int(rectGrid.minX) ... Int(rectGrid.maxX) {
-                setGrid( x, y, 0.0)
-            }
-        }
     }
     
     func draw() {

@@ -131,7 +131,6 @@ class ViewController: NSViewController, RobotController {
         viewRender.needsDisplay = true
         
         occgrid.update(pt, fYaw: yawToRadians(data.m_nYaw), nAngle: data.m_nAngle, nDistance: data.m_nDistance + sonarOffset(data.m_nAngle))
-        // TODO: Clear rotated rect occupied by robot at pt
     }
     
     func sensorData() -> [(SSensorData, CGPoint)] {
