@@ -8,6 +8,7 @@
 
 import Foundation
 import Cocoa
+import Accelerate
 
 protocol ScalableOffsetable {
     func +(left: Self, right: CGVector) -> Self
@@ -333,6 +334,7 @@ class OccupancyGrid {
             bitmapFormat: NSBitmapFormat.allZeros,
             bytesPerRow: 0, bitsPerPixel: 0)!
 
+        imageEroded = image.copy() as! NSBitmapImageRep
         
         var color = 128
         for x in 0 ..< Int(image.size.width) {
@@ -343,6 +345,11 @@ class OccupancyGrid {
     }
     
     func update(pt: CGPoint, fYaw: CGFloat, nAngle : Int16, nDistance : Int16 ) {
+        var timebase = mach_timebase_info_data_t()
+        mach_timebase_info(&timebase)
+        
+        let tBegin = mach_absolute_time();
+        
         // update occgrid & occgridImage
         assert(nAngle==0 || abs(nAngle)==90)
         let fAngleSonar = CGFloat(fYaw) + CGFloat(M_PI_2) * CGFloat(sign(nAngle))
@@ -365,10 +372,26 @@ class OccupancyGrid {
         })
         
         // Clear position of robot itself
-        let rectRobot = SRotatedRect(ptCenter: transform(pt), size: robotSize/scale, fAngle: fYaw)
+        let rectRobot = SRotatedRect(ptCenter: transform(pt), size: sizeRobot/scale, fAngle: fYaw)
         rectRobot.forEachPoint({ (x: Int, y:Int) -> Void in
             self.setGrid(x, y, -100)
         })
+        
+        // Erode image
+        // A pixel p in imageEroded is marked free when the robot centered at p does not occupy an occupied pixel in self.image
+        // i.e. the pixel p has the maximum value of the surrounding pixels inside the diameter defined by the robot's size
+        // We overestimate robot size by taking robot diagonal 
+        let nKernelDiameter = UInt( ceil( sqrt( pow(sizeRobot.width, 2) + pow(sizeRobot.height, 2) ) / scale ) )
+        let anKernel = [UInt8](count: Int(nKernelDiameter * nKernelDiameter), repeatedValue: 0)
+        var vimgbufInput = vImage_Buffer(data: image.bitmapData, height: UInt(image.pixelsHigh), width: UInt(image.pixelsWide), rowBytes: image.bytesPerRow)
+        var vimgbufOutput = vImage_Buffer(data: imageEroded.bitmapData, height: UInt(image.pixelsHigh), width: UInt(image.pixelsWide), rowBytes: image.bytesPerRow)
+        
+        vImageErode_Planar8( &vimgbufInput, &vimgbufOutput, 0, 0, anKernel, nKernelDiameter, nKernelDiameter, UInt32(kvImageNoFlags) )
+        
+        let tEnd = mach_absolute_time();
+        let tNanoseconds = (tEnd - tBegin) * UInt64(timebase.numer) / UInt64(timebase.denom)
+        
+        NSLog("\(tNanoseconds / 1000000) ms")
     }
     
     func setGrid(x: Int, _ y: Int, _ value: Double) {
@@ -377,9 +400,9 @@ class OccupancyGrid {
         image.setPixel(&color, atX: x, y: y)
     }
     
-    func draw() {
+    func draw(bShowOriginalMap : Bool) {
         let sizeImage = image.size * scale
-        image.drawInRect(NSRect(
+        (bShowOriginalMap ? image : imageEroded).drawInRect(NSRect(
             x: -sizeImage.width/2,
             y: sizeImage.height/2,
             width: sizeImage.width,
@@ -401,5 +424,6 @@ class OccupancyGrid {
     // occupancy grid as 8-bit greyscale image
     // (0,0) is top-left, different from other Cocoa coordinate systems
     var image : NSBitmapImageRep
+    var imageEroded : NSBitmapImageRep
 }
 

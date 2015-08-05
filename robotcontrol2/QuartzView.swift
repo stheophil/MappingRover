@@ -37,8 +37,7 @@ class QuartzView : NSView {
             transform.translateXBy(-ptLast.x, yBy: -ptLast.y)
             transform.concat()
             
-            self.controller.occupancy().draw()
-            self.controller.path().stroke()
+            self.controller.draw()
         }
         
         // Draw robot outline rotated by fYaw

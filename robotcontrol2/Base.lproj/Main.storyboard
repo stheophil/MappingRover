@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -679,23 +679,37 @@
                                         <rect key="frame" x="0.0" y="0.0" width="500" height="207"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <subviews>
-                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="Red-Bg-S6f">
-                                                <rect key="frame" x="330" y="171" width="152" height="18"/>
-                                                <buttonCell key="cell" type="check" title="Show Measurements" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2KJ-HV-ArX">
-                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                    <font key="font" metaFont="system"/>
-                                                </buttonCell>
-                                            </button>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="HTx-LB-1Eb" customClass="QuartzView" customModule="robotcontrol2" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="324" height="207"/>
                                             </customView>
+                                            <matrix verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AI7-bg-1Dn">
+                                                <rect key="frame" x="332" y="143" width="148" height="44"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                <size key="cellSize" width="101" height="18"/>
+                                                <size key="intercellSpacing" width="4" height="2"/>
+                                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="FwA-bQ-lN0">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <cells>
+                                                    <column>
+                                                        <buttonCell type="radio" title="Original Map" imagePosition="left" alignment="left" state="on" inset="2" id="Wzs-Zo-DFR">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <buttonCell type="radio" title="Eroded Map" imagePosition="left" alignment="left" tag="1" inset="2" id="ptc-kd-0or">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                    </column>
+                                                </cells>
+                                            </matrix>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="Red-Bg-S6f" firstAttribute="top" secondItem="zGo-DJ-tKJ" secondAttribute="top" constant="20" id="0J7-Um-nLx"/>
-                                            <constraint firstAttribute="trailing" secondItem="Red-Bg-S6f" secondAttribute="trailing" constant="20" id="1u9-9X-a4u"/>
                                             <constraint firstItem="HTx-LB-1Eb" firstAttribute="top" secondItem="zGo-DJ-tKJ" secondAttribute="top" id="DVn-eP-CtZ"/>
                                             <constraint firstItem="HTx-LB-1Eb" firstAttribute="leading" secondItem="zGo-DJ-tKJ" secondAttribute="leading" id="QIT-AP-lGU"/>
-                                            <constraint firstItem="Red-Bg-S6f" firstAttribute="leading" secondItem="HTx-LB-1Eb" secondAttribute="trailing" constant="8" id="a5m-xT-DAb"/>
+                                            <constraint firstItem="AI7-bg-1Dn" firstAttribute="leading" secondItem="HTx-LB-1Eb" secondAttribute="trailing" constant="8" symbolic="YES" id="Ud1-PF-dBw"/>
+                                            <constraint firstAttribute="trailing" secondItem="HTx-LB-1Eb" secondAttribute="trailing" constant="176" id="obB-Rv-Gpl"/>
                                             <constraint firstAttribute="bottom" secondItem="HTx-LB-1Eb" secondAttribute="bottom" id="zTg-qk-Uet"/>
                                         </constraints>
                                     </customView>
@@ -754,7 +768,7 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="btnMeasurement" destination="Red-Bg-S6f" id="29U-Gw-ozH"/>
+                        <outlet property="radiobtnShowMap" destination="AI7-bg-1Dn" id="4D5-Pr-5Pg"/>
                         <outlet property="textview" destination="qav-DC-KA4" id="tUa-vA-pyK"/>
                         <outlet property="viewRender" destination="HTx-LB-1Eb" id="zkd-0f-BAr"/>
                     </connections>

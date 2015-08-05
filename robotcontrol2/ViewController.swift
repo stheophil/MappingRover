@@ -20,15 +20,15 @@ protocol RobotController {
     func receivedSensorData(data: SSensorData)
     func sensorData() -> [(SSensorData, CGPoint)]
     
-    func path() -> NSBezierPath
-    func occupancy() -> OccupancyGrid
+    // draw
+    func draw()
     
     func log(msg: String)
 }
 
 // Robot configuration. Needs calibration.
 let wheelRadius = CGFloat(6) // cm
-let robotSize = CGSize(width: 30, height: 30) // cm
+let sizeRobot = CGSize(width: 30, height: 30) // cm
 let anSonarOffset = [6, 7, 2] // cm for -90, 0, 90 Angle
 func sonarOffset(nAngle: Int16) -> Int {
     assert(nAngle==0 || abs(nAngle)==90)
@@ -137,12 +137,10 @@ class ViewController: NSViewController, RobotController {
         return sensorDataArray
     }
     
-    func path() -> NSBezierPath {
-        return bezierpath
-    }
-    
-    func occupancy() -> OccupancyGrid {
-        return occgrid
+    func draw() {
+        let btnSelected = radiobtnShowMap.selectedCell() as! NSButtonCell
+        occgrid.draw(btnSelected.tag == 0)
+        bezierpath.stroke()
     }
     
     func log(msg: String) {
@@ -159,6 +157,6 @@ class ViewController: NSViewController, RobotController {
     
     @IBOutlet var viewRender: QuartzView!
     @IBOutlet var textview: NSTextView!
-    @IBOutlet var btnMeasurement: NSButton!
+    @IBOutlet var radiobtnShowMap: NSMatrix!
 }
 
