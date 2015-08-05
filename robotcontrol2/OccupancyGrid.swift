@@ -225,9 +225,9 @@ struct SArc {
         }
         
         let fSqrRadius = CGFloat(radius * radius)
-        for y in Int(floor(rectBound.minY)) ... Int(floor(rectBound.maxY)) {
+        for y in Int(round(rectBound.minY)) ... Int(round(rectBound.maxY)) {
             var bFoundPointsInLine = false
-            for x in Int(floor(rectBound.minX)) ... Int(floor(rectBound.maxX)) {
+            for x in Int(round(rectBound.minX)) ... Int(round(rectBound.maxX)) {
                 let pt = CGPoint(x: x, y: y)
                 let fSqrDistance = pt.SqrAbs()
                 
@@ -236,7 +236,7 @@ struct SArc {
                 && 0<=pt.compare(ptTo) { // count grid cells partially inside arc
                     bFoundPointsInLine = true
                
-                    foreach(x + Int(floor(ptCenter.x)), y + Int(floor(ptCenter.y)), fSqrDistance)
+                    foreach(x + Int(round(ptCenter.x)), y + Int(round(ptCenter.y)), fSqrDistance)
                     
                 } else if bFoundPointsInLine {
                     break // go to next line
@@ -264,15 +264,13 @@ struct SRotatedRect {
                 swap(&ptB, &ptA)
             }
             
-            // Always round down instead of rounding to nearest
-            // if ptA.x == 10.6, it occupies grid cell 10
-            let nBegin = Int(floor(ptA.x))
-            let nEnd = Int(floor(ptB.x))
+            let nBegin = Int(round(ptA.x))
+            let nEnd = Int(round(ptB.x))
             
             if(nBegin == nEnd) {
                 // straight vertical line
-                let nBeginY = Int( floor(min(ptA.y, ptB.y)) )
-                let nEndY = Int( floor(max(ptA.y, ptB.y)) )
+                let nBeginY = Int( round(min(ptA.y, ptB.y)) )
+                let nEndY = Int( round(max(ptA.y, ptB.y)) )
                 for y in nBeginY ... nEndY {
                     f(nBegin, y)
                 }
@@ -280,17 +278,17 @@ struct SRotatedRect {
                 let m : CGFloat = (ptB.y - ptA.y) / (ptB.x - ptA.x)
                 if(abs(m)<=1) { // x-step
                     for x in nBegin ... nEnd {
-                        f(x, Int(floor(ptA.y + m * CGFloat(x - nBegin))))
+                        f(x, Int(round(ptA.y + m * CGFloat(x - nBegin))))
                     }
                 } else { // y-step
                     if(ptB.y < ptA.y) {
                         swap(&ptB, &ptA);
                     }
-                    let nBeginY = Int( floor(ptA.y) )
-                    let nEndY = Int( floor(ptB.y) )
+                    let nBeginY = Int( round(ptA.y) )
+                    let nEndY = Int( round(ptB.y) )
                     
                     for y in nBeginY ... nEndY {
-                        f(Int(floor(ptA.x + CGFloat(y - nBeginY) / m)), y)
+                        f(Int(round(ptA.x + CGFloat(y - nBeginY) / m)), y)
                     }
                 }
             }
@@ -415,6 +413,8 @@ class OccupancyGrid {
         return (geom / scale) + gridOffset
     }
     
+    // When transforming coordinates to grid coordinates, always round to nearest
+    // i.e., the grid cell (0,0) is centered at point (0,0)
     let extent = 1000
     let scale : CGFloat = 5 // cm per pixel
     
