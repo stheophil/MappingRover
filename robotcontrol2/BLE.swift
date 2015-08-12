@@ -43,12 +43,13 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         RSSI: NSNumber!)
     {
         println("Discovered peripheral \(peripheral.name)")
-        
-        peripheralActive = peripheral
-        peripheralActive!.delegate = self
-        centralmgr.connectPeripheral(peripheral, options: nil)
-        
-        centralmgr.stopScan()
+        if peripheral.name == "rcontrol2" {
+            peripheralActive = peripheral
+            peripheralActive!.delegate = self
+            centralmgr.connectPeripheral(peripheral, options: nil)
+            
+            centralmgr.stopScan()
+        }
     }
     
     func centralManager(central : CBCentralManager!,

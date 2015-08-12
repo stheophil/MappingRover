@@ -682,10 +682,13 @@
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="HTx-LB-1Eb" customClass="QuartzView" customModule="robotcontrol2" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="324" height="207"/>
                                             </customView>
-                                            <matrix verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AI7-bg-1Dn">
-                                                <rect key="frame" x="332" y="143" width="148" height="44"/>
+                                            <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AI7-bg-1Dn">
+                                                <rect key="frame" x="332" y="147" width="148" height="40"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="40" id="Bec-81-Y2L"/>
+                                                </constraints>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                <size key="cellSize" width="101" height="18"/>
+                                                <size key="cellSize" width="148" height="19"/>
                                                 <size key="intercellSpacing" width="4" height="2"/>
                                                 <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="FwA-bQ-lN0">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -708,8 +711,10 @@
                                         <constraints>
                                             <constraint firstItem="HTx-LB-1Eb" firstAttribute="top" secondItem="zGo-DJ-tKJ" secondAttribute="top" id="DVn-eP-CtZ"/>
                                             <constraint firstItem="HTx-LB-1Eb" firstAttribute="leading" secondItem="zGo-DJ-tKJ" secondAttribute="leading" id="QIT-AP-lGU"/>
-                                            <constraint firstItem="AI7-bg-1Dn" firstAttribute="leading" secondItem="HTx-LB-1Eb" secondAttribute="trailing" constant="8" symbolic="YES" id="Ud1-PF-dBw"/>
+                                            <constraint firstItem="AI7-bg-1Dn" firstAttribute="top" secondItem="zGo-DJ-tKJ" secondAttribute="top" constant="20" id="gTe-zA-ua9"/>
+                                            <constraint firstAttribute="trailing" secondItem="AI7-bg-1Dn" secondAttribute="trailing" constant="20" id="i6O-Sw-Nn1"/>
                                             <constraint firstAttribute="trailing" secondItem="HTx-LB-1Eb" secondAttribute="trailing" constant="176" id="obB-Rv-Gpl"/>
+                                            <constraint firstItem="AI7-bg-1Dn" firstAttribute="leading" secondItem="HTx-LB-1Eb" secondAttribute="trailing" constant="8" id="ydh-5k-5US"/>
                                             <constraint firstAttribute="bottom" secondItem="HTx-LB-1Eb" secondAttribute="bottom" id="zTg-qk-Uet"/>
                                         </constraints>
                                     </customView>
