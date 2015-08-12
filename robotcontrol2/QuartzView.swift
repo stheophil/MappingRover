@@ -45,9 +45,9 @@ class QuartzView : NSView {
         transformRotate.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
         transformRotate.rotateByRadians(CGFloat(fYaw))
         
-        var outline = NSBezierPath(rect: NSMakeRect(-5.0, -5.0, 10.0, 10.0))
-        outline.moveToPoint(NSMakePoint(7.5, 0))
-        outline.lineToPoint(NSMakePoint(2.5, 0))
+        var outline = NSBezierPath(rect: NSRect(centeredAt: NSMakePoint(0, 0), size: sizeRobot))
+        outline.moveToPoint(NSMakePoint(sizeRobot.height / 2 + 2.5, 0))
+        outline.lineToPoint(NSMakePoint(sizeRobot.height / 2 - 2.5, 0))
         transformRotate.transformBezierPath(outline).stroke()
     }
     
