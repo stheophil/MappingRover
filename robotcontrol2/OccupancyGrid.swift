@@ -184,6 +184,10 @@ func sign<T : SignedNumberType>(x : T) -> Int {
     return x < 0 ? -1 : (0 < x ? 1 : 0)
 }
 
+func sqr<T : IntegerArithmeticType>(x : T) -> T {
+    return x * x
+}
+
 struct SArc {
     var ptCenter: CGPoint
     var angleFrom: CGFloat
@@ -343,11 +347,6 @@ class OccupancyGrid {
     }
     
     func update(pt: CGPoint, fYaw: CGFloat, nAngle : Int16, nDistance : Int16 ) {
-        var timebase = mach_timebase_info_data_t()
-        mach_timebase_info(&timebase)
-        
-        let tBegin = mach_absolute_time();
-        
         // update occgrid & occgridImage
         assert(nAngle==0 || abs(nAngle)==90)
         let fAngleSonar = CGFloat(fYaw) + CGFloat(M_PI_2) * CGFloat(sign(nAngle))
@@ -364,7 +363,7 @@ class OccupancyGrid {
             if fSqrDistance < fSqrMaxDistance {
                 let fInverseSensorModel = fSqrDistance < fSqrMeasuredDistance
                     ? -0.5 // free
-                    : 100.0 / sqrt(Double(fSqrDistance)) // occupied
+                    : Double(100.0 / self.scale) / sqrt(Double(fSqrDistance)) // occupied
                 self.setGrid(x, y, self.grid[x][y] + fInverseSensorModel) // - prior which is 0
             }
         })
@@ -385,11 +384,6 @@ class OccupancyGrid {
         var vimgbufOutput = vImage_Buffer(data: imageEroded.bitmapData, height: UInt(image.pixelsHigh), width: UInt(image.pixelsWide), rowBytes: image.bytesPerRow)
         
         vImageErode_Planar8( &vimgbufInput, &vimgbufOutput, 0, 0, anKernel, nKernelDiameter, nKernelDiameter, UInt32(kvImageNoFlags) )
-        
-        let tEnd = mach_absolute_time();
-        let tNanoseconds = (tEnd - tBegin) * UInt64(timebase.numer) / UInt64(timebase.denom)
-        
-        NSLog("\(tNanoseconds / 1000000) ms")
     }
     
     func setGrid(x: Int, _ y: Int, _ value: Double) {
@@ -408,14 +402,77 @@ class OccupancyGrid {
             ))
     }
     
-    private func transform<T: ScalableOffsetable>(geom: T) -> T {
+    // TODO: integer point, integer intervals?
+    func closestUnknownPoint(ptCenter: CGPoint) -> CGPoint {
+        let intvlUnknown = (UInt8(0.4 * 255), UInt8(0.6 * 255))
+        
+        let ptCenterTransformed = transform(ptCenter)
+        let ptnCenter = (Int(round(ptCenterTransformed.x)), Int(round(ptCenterTransformed.y)))
+        var ptnMin = ptnCenter
+        var nSqrMinDistance = Int.max
+        
+        // nDistanceMax is inclusive
+        var nDistanceMax = max(extent - ptnCenter.0 - 1, ptnCenter.0,
+            extent - ptnCenter.1 - 1, ptnCenter.1)
+        
+        let anBitmap = image.bitmapData
+        let cbBytesPerRow = image.bytesPerRow
+        
+        let UpdateClosest = { (x: Int, y: Int, nDistance: Int) -> Void in
+            let nColor = anBitmap[y * cbBytesPerRow + x]
+            if intvlUnknown.0 <= nColor && nColor < intvlUnknown.1 {
+                
+                let nSqrDistance = sqr(x - ptnCenter.0) + sqr(y - ptnCenter.1)
+                if nSqrDistance < nSqrMinDistance {
+                    // Point x, y is on the boundary of a rectangle around ptCenter
+                    // When we find a new closest point, calculate the size of the largest rectangle
+                    // that contains all points that may be closer than x,y
+                    nDistanceMax = Int(ceil(sqrt(CGFloat(nSqrDistance)) / CGFloat(nDistance)))
+                    
+                    ptnMin = (x, y)
+                    nSqrMinDistance = nSqrDistance
+                }
+            }
+        }
+        
+        for nDistance in 1 ... nDistanceMax {
+            let intvlnX = (max(0, ptnCenter.0-nDistance), min(extent-1, ptnCenter.0+nDistance))
+            for x in intvlnX.0 ... intvlnX.1 {
+                if 0 <= ptnCenter.1 - nDistance {
+                    UpdateClosest(x, ptnCenter.1 - nDistance, nDistance)
+                }
+                if ptnCenter.1 + nDistance < extent {
+                    UpdateClosest(x, ptnCenter.1 + nDistance, nDistance)
+                }
+            }
+            
+            let intvlnY = (max(0, ptnCenter.1-nDistance), min(extent-1, ptnCenter.1+nDistance))
+            for y in intvlnY.0 ... intvlnY.1 {
+                if 0 <= ptnCenter.0 - nDistance {
+                    UpdateClosest(ptnCenter.0 - nDistance, y, nDistance)
+                }
+                if ptnCenter.0 + nDistance < extent {
+                    UpdateClosest(ptnCenter.0 + nDistance, y, nDistance)
+                }
+            }
+        }
+        
+        return inverseTransform(CGPoint(x: ptnMin.0, y: ptnMin.1))
+    }
+    
+    private func transform<T: ScalableOffsetable>(geom: T) -> T { // to pixel coordinates
         let gridOffset = CGVector(dx: extent/2, dy: extent/2)
         return (geom / scale) + gridOffset
     }
     
+    private func inverseTransform<T: ScalableOffsetable>(geom: T) -> T { // from pixel coordinate
+        let gridOffset = CGVector(dx: extent/2, dy: extent/2)
+        return (geom - gridOffset) * scale
+    }
+    
     // When transforming coordinates to grid coordinates, always round to nearest
     // i.e., the grid cell (0,0) is centered at point (0,0)
-    let extent = 1000
+    let extent = 1000 // grid size in pixel, even number
     let scale : CGFloat = 5 // cm per pixel
     
     // occupancy grid in log odds representation

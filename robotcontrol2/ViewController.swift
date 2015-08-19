@@ -47,6 +47,20 @@ func yawToRadians(yaw: Int16) -> CGFloat {
     return CGFloat(-yaw)/1000.0
 }
 
+func withTimer(fn: () -> Void) {
+    var timebase = mach_timebase_info_data_t()
+    mach_timebase_info(&timebase)
+    
+    let tBegin = mach_absolute_time();
+    
+    fn()
+    
+    let tEnd = mach_absolute_time();
+    let tNanoseconds = (tEnd - tBegin) * UInt64(timebase.numer) / UInt64(timebase.denom)
+    
+    NSLog("\(tNanoseconds / 1000000) ms")
+}
+
 class ViewController: NSViewController, RobotController {
     let maxTurnSpeed : Int16 = 200
     let maxFwdSpeed : Int16 = 200
@@ -58,27 +72,27 @@ class ViewController: NSViewController, RobotController {
         viewRender.becomeFirstResponder()
         viewRender.controller = self
         
-        ble = BLE(controller: self)
+        m_ble = BLE(controller: self)
         
-        bezierpath.moveToPoint(NSPoint(x: 0, y: 0))
+        m_bezierpath.moveToPoint(NSPoint(x: 0, y: 0))
         
         // NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("onTimer"), userInfo: nil, repeats: true)
         
         assert(sizeof(SSensorData)==18)
         assert(sizeof(SRobotCommand)==8)
     }
-    
+
     /*
     var nYawPrev : Int16 = 0
     func onTimer() {
-        nYawPrev += 300
-        let data = SSensorData(m_nPitch: 0, m_nRoll: 0, m_nYaw: nYawPrev, m_nAngle: 90, m_nDistance: 200, m_anEncoderTicks: (400, 400, 400, 400))
+        nYawPrev += 200
+        let data = SSensorData(m_nPitch: 0, m_nRoll: 0, m_nYaw: nYawPrev, m_nAngle: 90, m_nDistance: 200, m_anEncoderTicks: (100, 100, 100, 100))
         receivedSensorData(data)
     }
     */
     
     override func viewDidDisappear() {
-        ble = nil
+        m_ble = nil
     }
 
     override var representedObject: AnyObject? {
@@ -89,7 +103,7 @@ class ViewController: NSViewController, RobotController {
     
     // RobotController interface
     func sendCommand(var cmd: SRobotCommand) {
-        ble.sendControlCommand(NSData(bytes:&cmd, length:sizeof(SRobotCommand)))
+        m_ble.sendControlCommand(NSData(bytes:&cmd, length:sizeof(SRobotCommand)))
     }
     
     func moveForward() {
@@ -115,32 +129,40 @@ class ViewController: NSViewController, RobotController {
         // assert( sign(data.m_anEncoderTicks.0) == sign(data.m_anEncoderTicks.2) )
         // assert( sign(data.m_anEncoderTicks.1) == sign(data.m_anEncoderTicks.3) )
         
-        let ptPrev = sensorDataArray.last?.1 ?? CGPointZero
-        var pt : CGPoint
-        if sign(data.m_anEncoderTicks.0) != sign(data.m_anEncoderTicks.1) { // turn
-            // position does not change
-            pt = ptPrev
-        } else {
-            pt = CGPoint(fromAngle: yawToRadians(data.m_nYaw), distance: encoderTicksToCm(data.m_anEncoderTicks.0))
-            pt.x += ptPrev.x
-            pt.y += ptPrev.y
+        withTimer({() in
+            let ptPrev = self.m_apairsdatapt.last?.1 ?? CGPointZero
+            var pt : CGPoint
+            if sign(data.m_anEncoderTicks.0) != sign(data.m_anEncoderTicks.1) { // turn
+                // position does not change
+                pt = ptPrev
+            } else {
+                pt = CGPoint(fromAngle: yawToRadians(data.m_nYaw), distance: encoderTicksToCm(data.m_anEncoderTicks.0))
+                pt.x += ptPrev.x
+                pt.y += ptPrev.y
+                
+                self.m_bezierpath.lineToPoint(pt)
+            }
+            self.m_apairsdatapt.append((data, pt))
+            self.viewRender.needsDisplay = true
             
-            bezierpath.lineToPoint(pt)
-        }
-        sensorDataArray.append((data, pt))
-        viewRender.needsDisplay = true
-        
-        occgrid.update(pt, fYaw: yawToRadians(data.m_nYaw), nAngle: data.m_nAngle, nDistance: data.m_nDistance + sonarOffset(data.m_nAngle))
+            self.m_occgrid.update(pt, fYaw: yawToRadians(data.m_nYaw), nAngle: data.m_nAngle, nDistance: data.m_nDistance + sonarOffset(data.m_nAngle))
+            
+            // Update path to closest points
+            self.m_ptClosest = self.m_occgrid.closestUnknownPoint(pt)
+        })
     }
     
     func sensorData() -> [(SSensorData, CGPoint)] {
-        return sensorDataArray
+        return m_apairsdatapt
     }
     
     func draw() {
         let btnSelected = radiobtnShowMap.selectedCell() as! NSButtonCell
-        occgrid.draw(btnSelected.tag == 0)
-        bezierpath.stroke()
+        m_occgrid.draw(btnSelected.tag == 0)
+        m_bezierpath.stroke()
+        
+        NSColor.greenColor().set()
+        NSRectFill(NSRect(centeredAt: m_ptClosest, size: CGSize(width: 10, height: 10)))
     }
     
     func log(msg: String) {
@@ -149,11 +171,13 @@ class ViewController: NSViewController, RobotController {
         // textview.scrollRangeToVisible(NSMakeRange(textview.string!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding), 0))
     }
     
-    var sensorDataArray = [(SSensorData, CGPoint)]() // sensor data including accumulated position
-    var bezierpath = NSBezierPath()
-    var occgrid = OccupancyGrid()
+    var m_apairsdatapt = [(SSensorData, CGPoint)]() // sensor data including accumulated position
+    var m_bezierpath = NSBezierPath()
+    var m_occgrid = OccupancyGrid()
     
-    var ble : BLE!
+    var m_ptClosest = CGPoint()
+    
+    var m_ble : BLE!
     
     @IBOutlet var viewRender: QuartzView!
     @IBOutlet var textview: NSTextView!
