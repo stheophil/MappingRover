@@ -14,6 +14,8 @@
 		9E39FBAA1A20CB82002D6835 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E39FBA81A20CB82002D6835 /* Main.storyboard */; };
 		9E39FBB61A20CB82002D6835 /* robotcontrol2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBB51A20CB82002D6835 /* robotcontrol2Tests.swift */; };
 		9E39FBC21A20D163002D6835 /* QuartzView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBC11A20D163002D6835 /* QuartzView.swift */; };
+		9E5987E41B87AD3400663682 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5987E31B87AD3400663682 /* Utilities.swift */; };
+		9E5987E61B87B39A00663682 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5987E31B87AD3400663682 /* Utilities.swift */; };
 		9E7DA6801A52BC4500AC00DB /* QuartzView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBC11A20D163002D6835 /* QuartzView.swift */; };
 		9E7DA6811A52BC5300AC00DB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBA41A20CB82002D6835 /* ViewController.swift */; };
 		9E7DA6821A52BC5600AC00DB /* BLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1529941A28E49800FE55D3 /* BLE.swift */; };
@@ -43,6 +45,7 @@
 		9E39FBB41A20CB82002D6835 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9E39FBB51A20CB82002D6835 /* robotcontrol2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = robotcontrol2Tests.swift; sourceTree = "<group>"; };
 		9E39FBC11A20D163002D6835 /* QuartzView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuartzView.swift; sourceTree = "<group>"; };
+		9E5987E31B87AD3400663682 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		9E7DA67F1A50A0FC00AC00DB /* rover_bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rover_bridge.h; sourceTree = "<group>"; };
 		9E9FDC7B1A97D63700D3A309 /* OccupancyGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OccupancyGrid.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -91,6 +94,7 @@
 				9E39FBA41A20CB82002D6835 /* ViewController.swift */,
 				9E39FBC11A20D163002D6835 /* QuartzView.swift */,
 				9E9FDC7B1A97D63700D3A309 /* OccupancyGrid.swift */,
+				9E5987E31B87AD3400663682 /* Utilities.swift */,
 				9E39FBA61A20CB82002D6835 /* Images.xcassets */,
 				9E39FBA81A20CB82002D6835 /* Main.storyboard */,
 				9E39FBA01A20CB82002D6835 /* Supporting Files */,
@@ -223,6 +227,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E5987E41B87AD3400663682 /* Utilities.swift in Sources */,
 				9E39FBC21A20D163002D6835 /* QuartzView.swift in Sources */,
 				9E9FDC7C1A97D63700D3A309 /* OccupancyGrid.swift in Sources */,
 				9E39FBA51A20CB82002D6835 /* ViewController.swift in Sources */,
@@ -238,6 +243,7 @@
 				9E7DA6811A52BC5300AC00DB /* ViewController.swift in Sources */,
 				9E39FBB61A20CB82002D6835 /* robotcontrol2Tests.swift in Sources */,
 				9E7DA6801A52BC4500AC00DB /* QuartzView.swift in Sources */,
+				9E5987E61B87B39A00663682 /* Utilities.swift in Sources */,
 				9E9FDC7D1A97DC7000D3A309 /* OccupancyGrid.swift in Sources */,
 				9E7DA6821A52BC5600AC00DB /* BLE.swift in Sources */,
 			);
