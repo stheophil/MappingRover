@@ -86,8 +86,14 @@ class ViewController: NSViewController, RobotController {
     var nYawPrev : Int16 = 0
     func onTimer() {
         nYawPrev += 200
-        let data = SSensorData(m_nPitch: 0, m_nRoll: 0, m_nYaw: nYawPrev, m_nAngle: 90, m_nDistance: 200, m_anEncoderTicks: (100, 100, 100, 100))
-        receivedSensorData(data)
+        let dataLeft = SSensorData(m_nPitch: 0, m_nRoll: 0, m_nYaw: nYawPrev, m_nAngle: 90, m_nDistance: 200, m_anEncoderTicks: (10, 10, 10, 10))
+        receivedSensorData(dataLeft)
+        
+        let dataRight = SSensorData(m_nPitch: 0, m_nRoll: 0, m_nYaw: nYawPrev, m_nAngle: -90, m_nDistance: 150, m_anEncoderTicks: (10, 10, 10, 10))
+        receivedSensorData(dataRight)
+        
+        let dataFront = SSensorData(m_nPitch: 0, m_nRoll: 0, m_nYaw: nYawPrev, m_nAngle: 0, m_nDistance: 170, m_anEncoderTicks: (10, 10, 10, 10))
+        receivedSensorData(dataFront)
     }
     */
     
@@ -145,10 +151,11 @@ class ViewController: NSViewController, RobotController {
             self.m_apairsdatapt.append((data, pt))
             self.viewRender.needsDisplay = true
             
-            self.m_occgrid.update(pt, fYaw: yawToRadians(data.m_nYaw), nAngle: data.m_nAngle, nDistance: data.m_nDistance + sonarOffset(data.m_nAngle))
+            let fYaw = yawToRadians(data.m_nYaw)
+            self.m_occgrid.update(pt, fYaw: fYaw, nAngle: data.m_nAngle, nDistance: data.m_nDistance + sonarOffset(data.m_nAngle))
             
             // Update path to closest points
-            self.m_ptClosest = self.m_occgrid.closestUnknownPoint(pt)
+            self.m_cPathToClosest = self.m_occgrid.closestUnknownPoint(pt, fYaw: fYaw)
         })
     }
     
@@ -161,8 +168,15 @@ class ViewController: NSViewController, RobotController {
         m_occgrid.draw(btnSelected.tag == 0)
         m_bezierpath.stroke()
         
+        if 0<m_cPathToClosest.count {
         NSColor.greenColor().set()
-        NSRectFill(NSRect(centeredAt: m_ptClosest, size: CGSize(width: 10, height: 10)))
+            let path = NSBezierPath()
+            path.moveToPoint(m_cPathToClosest.first!)
+            for pt in m_cPathToClosest {
+                path.lineToPoint(pt)
+            }
+            path.stroke()
+        }
     }
     
     func log(msg: String) {
@@ -175,7 +189,7 @@ class ViewController: NSViewController, RobotController {
     var m_bezierpath = NSBezierPath()
     var m_occgrid = OccupancyGrid()
     
-    var m_ptClosest = CGPoint()
+    var m_cPathToClosest = [CGPoint]()
     
     var m_ble : BLE!
     

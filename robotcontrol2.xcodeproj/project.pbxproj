@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9E1529951A28E49800FE55D3 /* BLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1529941A28E49800FE55D3 /* BLE.swift */; };
+		9E1C13C01B8E589000EB24C9 /* find_path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E5987E71B8BA9EE00663682 /* find_path.cpp */; };
 		9E39FBA31A20CB82002D6835 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBA21A20CB82002D6835 /* AppDelegate.swift */; };
 		9E39FBA51A20CB82002D6835 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBA41A20CB82002D6835 /* ViewController.swift */; };
 		9E39FBA71A20CB82002D6835 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9E39FBA61A20CB82002D6835 /* Images.xcassets */; };
@@ -15,7 +16,8 @@
 		9E39FBB61A20CB82002D6835 /* robotcontrol2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBB51A20CB82002D6835 /* robotcontrol2Tests.swift */; };
 		9E39FBC21A20D163002D6835 /* QuartzView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBC11A20D163002D6835 /* QuartzView.swift */; };
 		9E5987E41B87AD3400663682 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5987E31B87AD3400663682 /* Utilities.swift */; };
-		9E5987E61B87B39A00663682 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5987E31B87AD3400663682 /* Utilities.swift */; };
+		9E5987E51B87B25800663682 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5987E31B87AD3400663682 /* Utilities.swift */; };
+		9E5987E81B8BA9EE00663682 /* find_path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E5987E71B8BA9EE00663682 /* find_path.cpp */; };
 		9E7DA6801A52BC4500AC00DB /* QuartzView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBC11A20D163002D6835 /* QuartzView.swift */; };
 		9E7DA6811A52BC5300AC00DB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBA41A20CB82002D6835 /* ViewController.swift */; };
 		9E7DA6821A52BC5600AC00DB /* BLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1529941A28E49800FE55D3 /* BLE.swift */; };
@@ -46,6 +48,9 @@
 		9E39FBB51A20CB82002D6835 /* robotcontrol2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = robotcontrol2Tests.swift; sourceTree = "<group>"; };
 		9E39FBC11A20D163002D6835 /* QuartzView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuartzView.swift; sourceTree = "<group>"; };
 		9E5987E31B87AD3400663682 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		9E5987E71B8BA9EE00663682 /* find_path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = find_path.cpp; sourceTree = "<group>"; };
+		9E5987E91B8BAD7900663682 /* find_path.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = find_path.h; sourceTree = "<group>"; };
+		9E5987EA1B8BBB6F00663682 /* find_path_c.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = find_path_c.h; sourceTree = "<group>"; };
 		9E7DA67F1A50A0FC00AC00DB /* rover_bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rover_bridge.h; sourceTree = "<group>"; };
 		9E9FDC7B1A97D63700D3A309 /* OccupancyGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OccupancyGrid.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -89,6 +94,9 @@
 		9E39FB9F1A20CB82002D6835 /* robotcontrol2 */ = {
 			isa = PBXGroup;
 			children = (
+				9E5987E71B8BA9EE00663682 /* find_path.cpp */,
+				9E5987E91B8BAD7900663682 /* find_path.h */,
+				9E5987EA1B8BBB6F00663682 /* find_path_c.h */,
 				9E39FBA21A20CB82002D6835 /* AppDelegate.swift */,
 				9E1529941A28E49800FE55D3 /* BLE.swift */,
 				9E39FBA41A20CB82002D6835 /* ViewController.swift */,
@@ -233,6 +241,7 @@
 				9E39FBA51A20CB82002D6835 /* ViewController.swift in Sources */,
 				9E39FBA31A20CB82002D6835 /* AppDelegate.swift in Sources */,
 				9E1529951A28E49800FE55D3 /* BLE.swift in Sources */,
+				9E5987E81B8BA9EE00663682 /* find_path.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,9 +252,10 @@
 				9E7DA6811A52BC5300AC00DB /* ViewController.swift in Sources */,
 				9E39FBB61A20CB82002D6835 /* robotcontrol2Tests.swift in Sources */,
 				9E7DA6801A52BC4500AC00DB /* QuartzView.swift in Sources */,
-				9E5987E61B87B39A00663682 /* Utilities.swift in Sources */,
 				9E9FDC7D1A97DC7000D3A309 /* OccupancyGrid.swift in Sources */,
 				9E7DA6821A52BC5600AC00DB /* BLE.swift in Sources */,
+				9E5987E51B87B25800663682 /* Utilities.swift in Sources */,
+				9E1C13C01B8E589000EB24C9 /* find_path.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,6 +315,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"~/Programming/boost_1_59_0",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -343,6 +358,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"~/Programming/boost_1_59_0",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -354,10 +374,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
 				INFOPLIST_FILE = robotcontrol2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -365,7 +391,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
 				INFOPLIST_FILE = robotcontrol2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -387,6 +418,7 @@
 				);
 				INFOPLIST_FILE = robotcontrol2Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				OTHER_SWIFT_FLAGS = "-DDEBUG";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/robotcontrol2.app/Contents/MacOS/robotcontrol2";
 			};
