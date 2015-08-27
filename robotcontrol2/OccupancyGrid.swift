@@ -148,6 +148,24 @@ struct SRotatedRect {
     }
 }
 
+struct SBitmapData {
+    var m_bitmapData : UnsafeMutablePointer<UInt8>
+    var m_cbBytesPerRow : Int
+    init(_ image: NSBitmapImageRep) {
+        m_bitmapData = image.bitmapData
+        m_cbBytesPerRow = image.bytesPerRow
+    }
+    
+    func color(x: Int, _ y: Int) -> UInt8 {
+        return m_bitmapData[y * m_cbBytesPerRow + x]
+    }
+    
+    func setColor(x: Int, _ y: Int, _ color: UInt8 ) {
+        var p = m_bitmapData.advancedBy(y * m_cbBytesPerRow + x)
+        p.put(color)
+    }
+}
+
 class OccupancyGrid {
     init() {
         // occupancy grid in log odds representation
@@ -189,19 +207,26 @@ class OccupancyGrid {
         let fSqrMaxDistance = pow(sonarMaxDistance/scale, 2)
         let fSqrMeasuredDistance = pow((CGFloat(nDistance) - sonarDistanceTolerance/2)/scale, 2)
         
+        let bitmap = SBitmapData(image)
+        let UpdateGrid = {(x: Int, y: Int, value: Double) -> Void in
+            self.grid[x][y] = value
+            var color = UInt8(round(1 / ( 1 + exp( value ))  * 255))
+            bitmap.setColor(x, y, color)
+        }
+        
         arc.forEachPoint({ (x: Int, y: Int, fSqrDistance: CGFloat) -> Void in
             if fSqrDistance < fSqrMaxDistance {
                 let fInverseSensorModel = fSqrDistance < fSqrMeasuredDistance
                     ? -0.5 // free
                     : Double(100.0 / self.scale) / sqrt(Double(fSqrDistance)) // occupied
-                self.setGrid(x, y, self.grid[x][y] + fInverseSensorModel) // - prior which is 0
+                UpdateGrid(x, y, self.grid[x][y] + fInverseSensorModel) // - prior which is 0
             }
         })
         
         // Clear position of robot itself
         let rectRobot = SRotatedRect(ptCenter: transform(pt), size: sizeRobot/scale, fAngle: fYaw)
         rectRobot.forEachPoint({ (x: Int, y:Int) -> Void in
-            self.setGrid(x, y, -100)
+            UpdateGrid(x, y, -100)
         })
         
         // Erode image
@@ -216,12 +241,6 @@ class OccupancyGrid {
         vImageErode_Planar8( &vimgbufInput, &vimgbufOutput, 0, 0, anKernel, nKernelDiameter, nKernelDiameter, UInt32(kvImageNoFlags) )
     }
     
-    func setGrid(x: Int, _ y: Int, _ value: Double) {
-        grid[x][y] = value
-        var color = Int(round(1 / ( 1 + exp( value ))  * 255))
-        image.setPixel(&color, atX: x, y: y)
-    }
-    
     func draw(bShowOriginalMap : Bool) {
         let sizeImage = image.size * scale
         (bShowOriginalMap ? image : imageEroded).drawInRect(NSRect(
@@ -229,15 +248,17 @@ class OccupancyGrid {
             y: sizeImage.height/2,
             width: sizeImage.width,
             height: -sizeImage.height
-            ))
+        ))
     }
     
-    // TODO: integer point, integer intervals?
-    func closestUnknownPoint(ptCenter: CGPoint) -> CGPoint {
+    func closestUnknownPoint(ptCenter: CGPoint, fYaw: CGFloat) -> [CGPoint] {
         let intvlUnknown = (UInt8(0.4 * 255), UInt8(0.6 * 255))
         
         let ptCenterTransformed = transform(ptCenter)
         let ptnCenter = (Int(round(ptCenterTransformed.x)), Int(round(ptCenterTransformed.y)))
+        // Convert fYaw (CCW) to C dir enum (see find_path.h): left = 0, up = 1, right = 2, down = 3
+        let dirInitial = (-Int32(round(Double(fYaw) * 2 / M_PI)) + 2)%4
+        
         var ptnMin = ptnCenter
         var nSqrMinDistance = Int.max
         
@@ -245,13 +266,11 @@ class OccupancyGrid {
         var nDistanceMax = max(extent - ptnCenter.0 - 1, ptnCenter.0,
             extent - ptnCenter.1 - 1, ptnCenter.1)
         
-        let anBitmap = image.bitmapData
-        let cbBytesPerRow = image.bytesPerRow
+        let bitmap = SBitmapData(image)
         
         let UpdateClosest = { (x: Int, y: Int, nDistance: Int) -> Void in
-            let nColor = anBitmap[y * cbBytesPerRow + x]
+            let nColor = bitmap.color(x, y)
             if intvlUnknown.0 <= nColor && nColor < intvlUnknown.1 {
-                
                 let nSqrDistance = sqr(x - ptnCenter.0) + sqr(y - ptnCenter.1)
                 if nSqrDistance < nSqrMinDistance {
                     // Point x, y is on the boundary of a rectangle around ptCenter
@@ -287,7 +306,19 @@ class OccupancyGrid {
             }
         }
         
-        return inverseTransform(CGPoint(x: ptnMin.0, y: ptnMin.1))
+        // Assume ptnMin is reachable
+        // TODO: Search path on eroded map
+        var cptnPath = [CGPoint]()
+        find_path(
+            Int32(ptnCenter.0), Int32(ptnCenter.1),
+            dirInitial,
+            Int32(ptnMin.0), Int32(ptnMin.1),
+            bitmap.m_bitmapData, UInt32(bitmap.m_cbBytesPerRow), Int32(extent),
+            {(x: Int32, y: Int32) -> Void in
+                cptnPath.append( self.inverseTransform(CGPoint(x: Int(x), y: Int(y))) )
+            }
+        )
+        return cptnPath
     }
     
     private func transform<T: ScalableOffsetable>(geom: T) -> T { // to pixel coordinates
