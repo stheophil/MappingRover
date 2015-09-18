@@ -180,7 +180,7 @@ class ViewController: NSViewController, RobotController {
     }
     
     func log(msg: String) {
-        print(msg)
+        print(msg, terminator: "")
         // textview.string? += msg
         // textview.scrollRangeToVisible(NSMakeRange(textview.string!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding), 0))
     }

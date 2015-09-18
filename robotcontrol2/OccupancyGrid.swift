@@ -35,7 +35,7 @@ struct SArc {
         var ptFrom =  CGPoint(fromAngle: angleFrom, distance: radius) // relative to ptCenter
         var ptTo =  CGPoint(fromAngle: angleTo, distance: radius)
         
-        assert(angularDistance(angleFrom, angleTo)<CGFloat(M_PI/2))
+        assert(angularDistance(angleFrom, angleB: angleTo)<CGFloat(M_PI/2))
         assert(ptFrom.compare(ptTo) != 0)
         
         if ptFrom.compare(ptTo) < 0 { // ptFrom should be left of ptTo
@@ -47,7 +47,7 @@ struct SArc {
         
         assert(nQuadrantFrom==nQuadrantTo || nQuadrantFrom==(nQuadrantTo+1)%4)
         
-        var rectBound = CGRect(fromPoints: ptFrom, ptTo, CGPoint(x: 0, y: 0))
+        let rectBound = CGRect(fromPoints: ptFrom, ptTo, CGPoint(x: 0, y: 0))
         if nQuadrantFrom != nQuadrantTo {
             switch nQuadrantFrom {
             case 0: rectBound |= CGPoint(x: radius, y: 0)
@@ -131,7 +131,7 @@ struct SRotatedRect {
         // TODO: The map could be avoided by sorting the line segments
         var dictMinMaxX = [Int: (Int, Int)]()
         for i in 0 ..< apt.count {
-            rasterize(apt[i], apt[(i+1)%apt.count], { (x: Int, y: Int) -> Void in
+            rasterize(apt[i], ptB: apt[(i+1)%apt.count], f: { (x: Int, y: Int) -> Void in
                 if let pairMinMax = dictMinMaxX[y] {
                     dictMinMaxX[y] = (min(pairMinMax.0, x), max(pairMinMax.1, x))
                 } else {
@@ -160,9 +160,9 @@ struct SBitmapData {
         return m_bitmapData[y * m_cbBytesPerRow + x]
     }
     
-    func setColor(x: Int, _ y: Int, _ color: UInt8 ) {
-        var p = m_bitmapData.advancedBy(y * m_cbBytesPerRow + x)
-        p.put(color)
+    func setColor(x: Int, _ y: Int, var _ color: UInt8 ) {
+        let p = m_bitmapData.advancedBy(y * m_cbBytesPerRow + x)
+        p.assignFrom(&color, count: 1)
     }
 }
 
@@ -181,7 +181,7 @@ class OccupancyGrid {
             hasAlpha: false,
             isPlanar: true,
             colorSpaceName: NSDeviceWhiteColorSpace,
-            bitmapFormat: NSBitmapFormat.allZeros,
+            bitmapFormat: NSBitmapFormat(),
             bytesPerRow: 0, bitsPerPixel: 0)!
 
         imageEroded = image.copy() as! NSBitmapImageRep
@@ -210,7 +210,7 @@ class OccupancyGrid {
         let bitmap = SBitmapData(image)
         let UpdateGrid = {(x: Int, y: Int, value: Double) -> Void in
             self.grid[x][y] = value
-            var color = UInt8(round(1 / ( 1 + exp( value ))  * 255))
+            let color = UInt8(round(1 / ( 1 + exp( value ))  * 255))
             bitmap.setColor(x, y, color)
         }
         

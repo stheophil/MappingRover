@@ -21,15 +21,15 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     }
     
     func scanForPeripherals() {
-        println("start scanning")
+        print("start scanning")
         
         centralmgr.scanForPeripheralsWithServices(nil, options:nil)
     }
     
     // CBCentralManagerDelegate interface
-    func centralManagerDidUpdateState(central: CBCentralManager!) {
+    func centralManagerDidUpdateState(central: CBCentralManager) {
         // check central.state
-        println("centralManagerDidUpdateState: \(central.state.rawValue)")
+        print("centralManagerDidUpdateState: \(central.state.rawValue)")
         
         if(central.state==CBCentralManagerState.PoweredOn) {
             scanForPeripherals()
@@ -37,13 +37,13 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         // TODO: Disconnect
     }
     
-    func centralManager(central: CBCentralManager!,
-        didDiscoverPeripheral peripheral: CBPeripheral!,
-        advertisementData: [NSObject : AnyObject]!,
-        RSSI: NSNumber!)
+    func centralManager(central: CBCentralManager,
+        didDiscoverPeripheral peripheral: CBPeripheral,
+        advertisementData: [String : AnyObject],
+        RSSI: NSNumber)
     {
         if let name = peripheral.name {
-            println("Discovered peripheral \(peripheral.name)")
+            print("Discovered peripheral \(peripheral.name)")
             if name ==  "rcontrol2" {
                 peripheralActive = peripheral
                 peripheralActive!.delegate = self
@@ -54,41 +54,41 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         }
     }
     
-    func centralManager(central : CBCentralManager!,
-        didConnectPeripheral peripheral : CBPeripheral!)
+    func centralManager(central : CBCentralManager,
+        didConnectPeripheral peripheral : CBPeripheral)
     {
-        println("Connected peripheral \(peripheral.name)")
+        print("Connected peripheral \(peripheral.name)")
         peripheralActive!.discoverServices(UUID_SERVICES)
     }
     
     // CBPeripheralDelegate interface
-    func peripheral(peripheral: CBPeripheral!,
-        didDiscoverServices error: NSError!)
+    func peripheral(peripheral: CBPeripheral,
+        didDiscoverServices error: NSError?)
     {
         assert(error==nil)
         // assert(peripheralActive!.services.count==1)
         
-        for service in peripheralActive!.services {
-            println("Discovered service \((service as! CBService).UUID.UUIDString)")
-            peripheralActive!.discoverCharacteristics(nil, forService: service as! CBService)
+        for service in peripheralActive!.services! {
+            print("Discovered service \(service.UUID.UUIDString)")
+            peripheralActive!.discoverCharacteristics(nil, forService: service)
         }
     }
     
-    func peripheral(peripheral: CBPeripheral!,
-        didDiscoverCharacteristicsForService service: CBService!,
-        error: NSError!)
+    func peripheral(peripheral: CBPeripheral,
+        didDiscoverCharacteristicsForService service: CBService,
+        error: NSError?)
     {
         assert(error==nil)
-        assert(service.characteristics.count==2)
-        for characteristic in service.characteristics {
-            println("Discovered characteristic \((characteristic as! CBCharacteristic).UUID.UUIDString)")
-            if (characteristic as! CBCharacteristic).UUID.UUIDString == UUID_TX_CHARACTERISTICS.UUIDString {
-                println("TX Characteristics found")
-                charTX = characteristic as! CBCharacteristic
+        assert(service.characteristics!.count==2)
+        for characteristic in service.characteristics! {
+            print("Discovered characteristic \(characteristic.UUID.UUIDString)")
+            if characteristic.UUID.UUIDString == UUID_TX_CHARACTERISTICS.UUIDString {
+                print("TX Characteristics found")
+                charTX = characteristic
             } else {
-                assert( (characteristic as! CBCharacteristic).UUID.UUIDString == UUID_RX_CHARACTERISTICS.UUIDString )
-                println("RX Characteristics found")
-                charRX = characteristic as! CBCharacteristic
+                assert( characteristic.UUID.UUIDString == UUID_RX_CHARACTERISTICS.UUIDString )
+                print("RX Characteristics found")
+                charRX = characteristic
                 
                 peripheralActive!.setNotifyValue(true, forCharacteristic: charRX)
             }
@@ -96,16 +96,16 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         assert(initialized())
     }
     
-    func peripheral(peripheral: CBPeripheral!, didUpdateNotificationStateForCharacteristic characteristic: CBCharacteristic!, error: NSError!)
+    func peripheral(peripheral: CBPeripheral, didUpdateNotificationStateForCharacteristic characteristic: CBCharacteristic, error: NSError?)
     {
-        println("Subscribing to Characteristics succeeded")
+        print("Subscribing to Characteristics succeeded")
         assert(error==nil)
     }
     
-    func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!)
+    func peripheral(peripheral: CBPeripheral, didUpdateValueForCharacteristic characteristic: CBCharacteristic, error: NSError?)
     {
         assert(error==nil)
-        var data = charRX.value()
+        let data = charRX.value!
         if(data.length==sizeof(SSensorData)) {
             controller.receivedSensorData(UnsafePointer<SSensorData>(data.bytes).memory)
         }

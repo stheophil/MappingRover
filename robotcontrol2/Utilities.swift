@@ -53,11 +53,11 @@ func -(left: CGPoint, right: CGPoint) -> CGVector {
 
 // CGRect operators
 func +(left: CGRect, right: CGVector) -> CGRect {
-    return left.rectByOffsetting(dx: right.dx, dy: right.dy)
+    return left.offsetBy(dx: right.dx, dy: right.dy)
 }
 
 func -(left: CGRect, right: CGVector) -> CGRect {
-    return left.rectByOffsetting(dx: -right.dx, dy: -right.dy)
+    return left.offsetBy(dx: -right.dx, dy: -right.dy)
 }
 
 func *(left: CGRect, right: CGFloat) -> CGRect {
@@ -153,12 +153,12 @@ extension CGPoint : ScalableOffsetable {
 
 func RectFromPoints(points: [CGPoint]) -> (CGPoint, CGSize) {
     let bottomLeft = CGPoint(
-        x: minElement(points.map{ $0.x }),
-        y: minElement(points.map{ $0.y })
+        x: points.map{ $0.x }.minElement()!,
+        y: points.map{ $0.y }.minElement()!
     )
     let topRight = CGPoint(
-        x: maxElement(points.map{ $0.x }),
-        y: maxElement(points.map{ $0.y })
+        x: points.map{ $0.x }.maxElement()!,
+        y: points.map{ $0.y }.maxElement()!
     )
     return (bottomLeft, CGSize(topRight - bottomLeft))
 }

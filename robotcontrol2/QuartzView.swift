@@ -32,7 +32,7 @@ class QuartzView : NSView {
         let ptLast = sensordata.last?.1 ?? CGPointZero
         
         withGraphicsState() {
-            var transform = NSAffineTransform()
+            let transform = NSAffineTransform()
             transform.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
             transform.translateXBy(-ptLast.x, yBy: -ptLast.y)
             transform.concat()
@@ -41,18 +41,18 @@ class QuartzView : NSView {
         }
         
         // Draw robot outline rotated by fYaw
-        var transformRotate = NSAffineTransform()
+        let transformRotate = NSAffineTransform()
         transformRotate.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
         transformRotate.rotateByRadians(CGFloat(fYaw))
         
-        var outline = NSBezierPath(rect: NSRect(centeredAt: NSMakePoint(0, 0), size: sizeRobot))
+        let outline = NSBezierPath(rect: NSRect(centeredAt: NSMakePoint(0, 0), size: sizeRobot))
         outline.moveToPoint(NSMakePoint(sizeRobot.height / 2 + 2.5, 0))
         outline.lineToPoint(NSMakePoint(sizeRobot.height / 2 - 2.5, 0))
         transformRotate.transformBezierPath(outline).stroke()
     }
     
     override func keyDown(theEvent: NSEvent) {
-        if theEvent.modifierFlags & .NumericPadKeyMask != nil {
+        if theEvent.modifierFlags.intersect(.NumericPadKeyMask) != [] {
             interpretKeyEvents([theEvent])
         } else {
             super.keyDown(theEvent)
