@@ -123,6 +123,7 @@ struct SCompareKeyType : std::less<SPosition::key_type> {
     }
 };
 
+// Output is in reverse order, from goal to start
 std::vector<SPosition> find_path(point const& ptStart, dir d, point const& ptGoal, SMap const& map) {
     // TODO: Consider time-out criterion, or track point with closest heuristic distance to ptGoal
     // and bail out if closest open point is much further than closest point
@@ -157,7 +158,14 @@ std::vector<SPosition> find_path(point const& ptStart, dir d, point const& ptGoa
                     return lhs.m_nCost < rhs.m_nCost;
                 });
                 ASSERT(itposMinimum!=setposVisited.end());
-                vecposPath.emplace_back(*itposMinimum);
+                if(1<vecposPath.size()
+                && ((vecposPath.back().m_pt.x==(vecposPath.end()-2)->m_pt.x && vecposPath.back().m_pt.x==itposMinimum->m_pt.x)
+                 || (vecposPath.back().m_pt.y==(vecposPath.end()-2)->m_pt.y && vecposPath.back().m_pt.y==itposMinimum->m_pt.y)))
+                {
+                    vecposPath.back() = *itposMinimum;
+                } else {
+                    vecposPath.emplace_back(*itposMinimum);
+                }
             }
             return vecposPath;
         }
@@ -185,7 +193,7 @@ std::vector<SPosition> find_path(point const& ptStart, dir d, point const& ptGoa
 
 extern "C" {
     // Objective-C / Swift interface
-    void find_path(int nStartX, int nStartY,
+    int find_path(int nStartX, int nStartY,
                    int nDirection,
                    int nGoalX, int nGoalY,
                    unsigned char const* pbImage,
@@ -194,12 +202,14 @@ extern "C" {
                    void (^foreachPoint)(int nX, int nY))
     {
         ASSERT(dir::begin<=nDirection && nDirection<dir::end);
-        boost::for_each(find_path(point{nStartX, nStartY},
-                                  static_cast<dir>(nDirection),
-                                  point{nGoalX, nGoalY},
-                                  SMap{pbImage, cbBytesPerRow, size{nExtent, nExtent}}),
+        auto vecposPath = find_path(point{nStartX, nStartY},
+                                    static_cast<dir>(nDirection),
+                                    point{nGoalX, nGoalY},
+                                    SMap{pbImage, cbBytesPerRow, size{nExtent, nExtent}});
+        boost::for_each(vecposPath,
                         [&](SPosition const& pos) {
                             foreachPoint(pos.m_pt.x, pos.m_pt.y);
                         });
+        return vecposPath.empty() ? std::numeric_limits<int>::max() : vecposPath.front().m_nCost;
     }
 }

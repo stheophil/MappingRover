@@ -2,7 +2,7 @@
 #ifdef __cplusplus
 extern "C"
 #endif
-void find_path(int nStartX, int nStartY,
+int find_path(int nStartX, int nStartY,
                int nDirection,
                int nGoalX, int nGoalY,
                unsigned char const* pbImage,
