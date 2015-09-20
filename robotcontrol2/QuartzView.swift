@@ -9,6 +9,32 @@
 import Foundation
 import Cocoa
 
+func -(left: CGPoint, right: CGVector) -> CGPoint {
+    return CGPointMake(left.x - right.dx, left.y - right.dy)
+}
+
+func *(left: CGSize, right: CGFloat) -> CGSize {
+    return CGSize(width: left.width * right, height: left.height * right)
+}
+
+func /(left: CGSize, right: CGFloat) -> CGSize {
+    return CGSize(width: left.width / right, height: left.height / right)
+}
+
+extension CGVector {
+    init(_ sz: CGSize) {
+        dx = sz.width
+        dy = sz.height
+    }
+}
+
+extension CGRect {
+    init(centeredAt pt: CGPoint, size: CGSize) {
+        self.origin = pt - CGVector(size/2)
+        self.size = size
+    }
+}
+
 class QuartzView : NSView {
     let centimetersPerPoint = 1
     
@@ -27,9 +53,9 @@ class QuartzView : NSView {
         let fillColor = NSColor.redColor()
         fillColor.set()
         
-        let sensordata = controller.sensorData()
-        let fYaw = yawToRadians(sensordata.last?.0.m_nYaw ?? 0)
-        let ptLast = sensordata.last?.1 ?? CGPointZero
+        let aptfPositions = controller.positions()
+        let ptLast = aptfPositions.last?.0 ?? CGPointZero
+        let fYaw = aptfPositions.last?.1 ?? 0
         
         withGraphicsState() {
             let transform = NSAffineTransform()
@@ -45,9 +71,9 @@ class QuartzView : NSView {
         transformRotate.translateXBy(self.bounds.width/2, yBy: self.bounds.height/2)
         transformRotate.rotateByRadians(CGFloat(fYaw))
         
-        let outline = NSBezierPath(rect: NSRect(centeredAt: NSMakePoint(0, 0), size: sizeRobot))
-        outline.moveToPoint(NSMakePoint(sizeRobot.height / 2 + 2.5, 0))
-        outline.lineToPoint(NSMakePoint(sizeRobot.height / 2 - 2.5, 0))
+        let outline = NSBezierPath(rect: NSRect(centeredAt: NSMakePoint(0, 0), size: NSMakeSize(CGFloat(c_nRobotWidth), CGFloat(c_nRobotHeight))))
+        outline.moveToPoint(NSMakePoint(CGFloat(c_nRobotHeight) / 2 + 2.5, 0))
+        outline.lineToPoint(NSMakePoint(CGFloat(c_nRobotHeight) / 2 - 2.5, 0))
         transformRotate.transformBezierPath(outline).stroke()
     }
     
@@ -85,6 +111,6 @@ class QuartzView : NSView {
         controller = nil
     }
     
-    var controller : RobotController!
+    var controller : RobotViewController!
 }
 

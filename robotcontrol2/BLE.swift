@@ -1,7 +1,7 @@
 import CoreBluetooth
 
 class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
-    init(controller: RobotController) {
+    init(controller: RobotViewController) {
         self.controller = controller
         
         super.init()
@@ -127,7 +127,7 @@ class BLE : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         }
     }
     
-    var controller : RobotController // TODO: Can't set to weak var
+    var controller : RobotViewController // TODO: Can't set to weak var
     
     var centralmgr : CBCentralManager!
     var peripheralActive : CBPeripheral?

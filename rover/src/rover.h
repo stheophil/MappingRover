@@ -21,4 +21,12 @@ struct SSensorData { // must be < 64 bytes
     short m_anEncoderTicks[4];
 };
 
+// Robot configuration
+
+int c_nRobotWidth = 30; // cm
+int c_nRobotHeight = 30; // cm
+
+short c_nMaxTurnSpeed = 200; // in same units as SRobotCommand.m_nSpeed*
+short c_nMaxFwdSpeed = 200;
+
 #endif
