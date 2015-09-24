@@ -16,26 +16,6 @@
 #define VERIFY(expr) (assert(expr))
 #define ASSERT(expr) (assert(expr))
 
-// point
-point operator+=(point& pt, size const& sz) {
-	pt.x += sz.x;
-	pt.y += sz.y;
-	return pt;
-}
-
-point operator-=(point& pt, size const& sz) {
-	pt.x -= sz.x;
-	pt.y -= sz.y;
-	return pt;
-}
-
-size operator-(point const& lhs, point const& rhs) {
-    return size{lhs.x - rhs.x, lhs.y - rhs.y};
-}
-
-bool operator==(point const& lhs, point const& rhs) {
-    return lhs.x == rhs.x && lhs.y == rhs.y;
-}
 
 // size
 

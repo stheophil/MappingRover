@@ -1,9 +1,12 @@
 #import "../rover/src/rover.h" // Data structures and configuration data shared with Arduino controller
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Robot controller C interface used by Swift GUI
 struct SRobotController;
-
 struct SRobotController* robot_new_controller();
 
 // Returns new robot pose. The x,y coordinates are in coordinates of the
@@ -27,3 +30,7 @@ struct SBitmap {
     size_t m_nScale; // cm per pixel
 };
 struct SBitmap robot_get_map(struct SRobotController* probot, bool bEroded);
+
+#ifdef __cplusplus
+}
+#endif
