@@ -3,11 +3,14 @@
 #include "math.h"
 #include "geometry.h"
 #include "nonmoveable.h"
+#include "occupancy_grid.h"
+
 #include <vector>
 
 namespace rbt {
-    struct SRobotController : rbt::nonmoveable {
-        SRobotController() {}
+    struct CRobotController : rbt::nonmoveable {
+        CRobotController()
+            : m_occgrid(rbt::size<int>(400, 400), /*nScale*/5) {} // = Map of 20m x 20m map
         
         void receivedSensorData(SSensorData const& data) {
             // TODO: Fuse odometry and IMU sensors?
@@ -23,16 +26,17 @@ namespace rbt {
             }
             
             m_vecpairptfPose.emplace_back(std::make_pair(pt, yawToRadians(data.m_nYaw)));
-            // m_occgrid.update(pt, fYaw, data.m_nAngle, data.m_nDistance + sonarOffset(data.m_nAngle));
+            m_occgrid.update(pt, fYaw, data.m_nAngle, data.m_nDistance + sonarOffset(data.m_nAngle));
         }
     private:
+        rbt::COccupancyGrid m_occgrid;
         std::vector<std::pair<rbt::point<int>, double>> m_vecpairptfPose;
     };
 }
-rbt::SRobotController g_robotcontroller;
+rbt::CRobotController g_robotcontroller;
 
-struct SRobotController* robot_new_controller() {
-    return reinterpret_cast<::SRobotController*>(&g_robotcontroller);
+struct CRobotController* robot_new_controller() {
+    return reinterpret_cast<::CRobotController*>(&g_robotcontroller);
 }
 
 //

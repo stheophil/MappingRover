@@ -6,8 +6,8 @@ extern "C" {
 #endif
 
 // Robot controller C interface used by Swift GUI
-struct SRobotController;
-struct SRobotController* robot_new_controller();
+struct CRobotController;
+struct CRobotController* robot_new_controller();
 
 // Returns new robot pose. The x,y coordinates are in coordinates of the
 // internal maps, i.e., they may be scaled.
@@ -17,7 +17,7 @@ struct SPose {
     int y;
     double fYaw;
 };
-struct SPose robot_received_sensor_data(struct SRobotController* probot, struct SSensorData data);
+struct SPose robot_received_sensor_data(struct CRobotController* probot, struct SSensorData data);
 
 // Returns pointer to the current robot maps as bitmaps.
 // Returns either the raw map (bEroded = false)
@@ -29,7 +29,7 @@ struct SBitmap {
     size_t m_nHeight;
     size_t m_nScale; // cm per pixel
 };
-struct SBitmap robot_get_map(struct SRobotController* probot, bool bEroded);
+struct SBitmap robot_get_map(struct CRobotController* probot, bool bEroded);
 
 #ifdef __cplusplus
 }

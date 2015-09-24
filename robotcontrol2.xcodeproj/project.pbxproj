@@ -48,6 +48,7 @@
 		9EF738BC1BB471C400E06378 /* geometry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = geometry.h; sourceTree = "<group>"; };
 		9EF738BD1BB472CD00E06378 /* nonmoveable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nonmoveable.h; sourceTree = "<group>"; };
 		9EF738BF1BB47A1900E06378 /* math.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = math.h; sourceTree = "<group>"; };
+		9EF738C01BB4824700E06378 /* occupancy_grid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = occupancy_grid.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +92,7 @@
 			children = (
 				9ED9A97F1BAF477F00843215 /* robot_controller_c.h */,
 				9ED9A9801BB094A700843215 /* robot_controller.cpp */,
+				9EF738C01BB4824700E06378 /* occupancy_grid.h */,
 				9EF738BF1BB47A1900E06378 /* math.h */,
 				9EF738BD1BB472CD00E06378 /* nonmoveable.h */,
 				9EF738BC1BB471C400E06378 /* geometry.h */,
