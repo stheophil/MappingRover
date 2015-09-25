@@ -42,9 +42,9 @@ int sonarOffset(short nAngle) {
     return c_anSonarOffset[nAngle/90 + 1];
 }
 
-int c_nSonarMaxDistance = 300; // cm = Sonar max distance (Note: depends on mounting height)
+double c_fSonarMaxDistance = 300.0; // cm = Sonar max distance (Note: depends on mounting height)
 double c_fSonarOpeningAngle = M_PI_2 / 6; // 15 degrees = Sensor opening angle (Note: Depends on sensor)
-int c_nSonarDistanceTolerance = 5; // cm (Note: Need to calibrate, should be in % maybe.)
+double c_fSonarDistanceTolerance = 5.0; // cm (Note: Need to calibrate, should be in % maybe.)
 
 double encoderTicksToCm(short nTicks) { // Note: Formula depends on wheel encoders
     return nTicks * 6.0 * M_PI * c_nWheelRadius / 1000.0;

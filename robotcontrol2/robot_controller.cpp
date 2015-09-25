@@ -16,21 +16,21 @@ namespace rbt {
             // TODO: Fuse odometry and IMU sensors?
             auto const fYaw = yawToRadians(data.m_nYaw);
             
-            auto const ptPrev = m_vecpairptfPose.empty() ? rbt::point<int>::zero() : m_vecpairptfPose.back().first;
-            rbt::point<int> pt;
+            auto const ptfPrev = m_vecpairptfPose.empty() ? rbt::point<double>::zero() : m_vecpairptfPose.back().first;
+            rbt::point<double> ptf;
             if(rbt::sign(data.m_anEncoderTicks[0]) != rbt::sign(data.m_anEncoderTicks[1])) {
                 // turning, position does not change
-                pt = ptPrev;
+                ptf = ptfPrev;
             } else {
-                pt = ptPrev + rbt::size<int>::fromAngleAndDistance(fYaw, encoderTicksToCm(data.m_anEncoderTicks[0]));
+                ptf = ptfPrev + rbt::size<double>::fromAngleAndDistance(fYaw, encoderTicksToCm(data.m_anEncoderTicks[0]));
             }
             
-            m_vecpairptfPose.emplace_back(std::make_pair(pt, yawToRadians(data.m_nYaw)));
-            m_occgrid.update(pt, fYaw, data.m_nAngle, data.m_nDistance + sonarOffset(data.m_nAngle));
+            m_vecpairptfPose.emplace_back(std::make_pair(ptf, yawToRadians(data.m_nYaw)));
+            m_occgrid.update(ptf, fYaw, data.m_nAngle, data.m_nDistance + sonarOffset(data.m_nAngle));
         }
     private:
         rbt::COccupancyGrid m_occgrid;
-        std::vector<std::pair<rbt::point<int>, double>> m_vecpairptfPose;
+        std::vector<std::pair<rbt::point<double>, double>> m_vecpairptfPose;
     };
 }
 rbt::CRobotController g_robotcontroller;

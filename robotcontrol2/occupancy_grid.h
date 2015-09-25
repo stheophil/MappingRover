@@ -14,14 +14,23 @@
 
 namespace rbt {
     struct COccupancyGrid : rbt::nonmoveable {
-        COccupancyGrid(rbt::size<int> const& szn, int nScale) : m_szn(szn), m_nScale(nScale) {}
-        
-        void update(point<int> const& pt, double fYaw, int nAngle, int nDistance) {
+        COccupancyGrid(rbt::size<int> const& szn, int nScale) : m_szn(szn), m_nScale(nScale) {
+            assert(0==szn.x%2 && 0==szn.y%2);
         }
         
+        void update(point<double> const& ptf, double fYaw, int nAngle, int nDistance);
+
     private:
         rbt::size<int> m_szn;
         int m_nScale; // cm per pixel
+        
+    public:
+        template<typename T>
+        point<int> toGridCoordinates(point<T> const& t) const {
+            return point<int>(t/m_nScale) + m_szn/2;
+        }
+        
+        point<int> toWorldCoordinates(point<int> const& pt) const;
     };
 }
 #endif /* occupancy_grid_h */

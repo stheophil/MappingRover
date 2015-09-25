@@ -13,6 +13,7 @@
 #include <limits>
 #include <cmath>
 #include <cfenv>
+#include <assert.h>
 
 namespace rbt {
     template<typename T>
@@ -35,7 +36,7 @@ namespace rbt {
     template<typename Dst, typename Src>
     std::enable_if_t<std::is_floating_point<Dst>::value && std::is_integral<Src>::value,
     Dst> numeric_cast(Src t) {
-        assert(std::numeric_limits<Dst>::lowest()<=t && t<=std::numeric_limits<Dst>::highest());
+        assert(std::numeric_limits<Dst>::lowest()<=t && t<=std::numeric_limits<Dst>::max());
         return static_cast<Dst>(t);
     }
     
@@ -44,6 +45,11 @@ namespace rbt {
         return 0<t
             ? 1
             : (t<0 ? -1 : 0);
+    }
+    
+    template<typename T>
+    T sqr(T const& t) { // TODO: introduce rbt::sqr_type<T>, so int * int -> int64?
+        return t*t;
     }
 }
 

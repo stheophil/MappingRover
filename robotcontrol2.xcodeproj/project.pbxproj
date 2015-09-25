@@ -18,6 +18,7 @@
 		9E7DA6811A52BC5300AC00DB /* RobotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39FBA41A20CB82002D6835 /* RobotViewController.swift */; };
 		9E7DA6821A52BC5600AC00DB /* BLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1529941A28E49800FE55D3 /* BLE.swift */; };
 		9ED9A9811BB094A700843215 /* robot_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9A9801BB094A700843215 /* robot_controller.cpp */; settings = {ASSET_TAGS = (); }; };
+		9EF738C21BB4849700E06378 /* occupancy_grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF738C11BB4849700E06378 /* occupancy_grid.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		9EF738BD1BB472CD00E06378 /* nonmoveable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nonmoveable.h; sourceTree = "<group>"; };
 		9EF738BF1BB47A1900E06378 /* math.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = math.h; sourceTree = "<group>"; };
 		9EF738C01BB4824700E06378 /* occupancy_grid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = occupancy_grid.h; sourceTree = "<group>"; };
+		9EF738C11BB4849700E06378 /* occupancy_grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = occupancy_grid.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +95,7 @@
 				9ED9A97F1BAF477F00843215 /* robot_controller_c.h */,
 				9ED9A9801BB094A700843215 /* robot_controller.cpp */,
 				9EF738C01BB4824700E06378 /* occupancy_grid.h */,
+				9EF738C11BB4849700E06378 /* occupancy_grid.cpp */,
 				9EF738BF1BB47A1900E06378 /* math.h */,
 				9EF738BD1BB472CD00E06378 /* nonmoveable.h */,
 				9EF738BC1BB471C400E06378 /* geometry.h */,
@@ -237,6 +240,7 @@
 				9E39FBC21A20D163002D6835 /* QuartzView.swift in Sources */,
 				9E39FBA51A20CB82002D6835 /* RobotViewController.swift in Sources */,
 				9ED9A9811BB094A700843215 /* robot_controller.cpp in Sources */,
+				9EF738C21BB4849700E06378 /* occupancy_grid.cpp in Sources */,
 				9E39FBA31A20CB82002D6835 /* AppDelegate.swift in Sources */,
 				9E1529951A28E49800FE55D3 /* BLE.swift in Sources */,
 			);
