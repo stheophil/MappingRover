@@ -1,6 +1,9 @@
 #import "../rover/src/rover.h" // Data structures and configuration data shared with Arduino controller
 #include <stddef.h>
 
+#ifndef robot_controller_c
+#define robot_controller_c
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,3 +37,5 @@ struct SBitmap robot_get_map(struct CRobotController* probot, bool bEroded);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // robot_controller_c

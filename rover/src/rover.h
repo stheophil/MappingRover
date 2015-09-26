@@ -24,33 +24,33 @@ struct SSensorData { // must be < 64 bytes
     short m_anEncoderTicks[4]; // front left, front right, back left, back right
 };
 
-double yawToRadians(short nYaw) {
+inline double yawToRadians(short nYaw) {
     return -nYaw/1000.0;
 }
 
 // Robot configuration
 
-int c_nRobotWidth = 30; // cm
-int c_nRobotHeight = 30; // cm
+const int c_nRobotWidth = 30; // cm
+const int c_nRobotHeight = 30; // cm
 
-int c_nWheelRadius = 6; // cm
+const int c_nWheelRadius = 6; // cm
 
-int c_anSonarOffset[] = {6, 7, 2}; // cm for -90, 0, 90 Angle
+const int c_anSonarOffset[] = {6, 7, 2}; // cm for -90, 0, 90 Angle
 
-int sonarOffset(short nAngle) {
+inline int sonarOffset(short nAngle) {
     assert(nAngle==0 || abs(nAngle)==90);
     return c_anSonarOffset[nAngle/90 + 1];
 }
 
-double c_fSonarMaxDistance = 300.0; // cm = Sonar max distance (Note: depends on mounting height)
-double c_fSonarOpeningAngle = M_PI_2 / 6; // 15 degrees = Sensor opening angle (Note: Depends on sensor)
-double c_fSonarDistanceTolerance = 5.0; // cm (Note: Need to calibrate, should be in % maybe.)
+const double c_fSonarMaxDistance = 300.0; // cm = Sonar max distance (Note: depends on mounting height)
+const double c_fSonarOpeningAngle = M_PI_2 / 6; // 15 degrees = Sensor opening angle (Note: Depends on sensor)
+const double c_fSonarDistanceTolerance = 5.0; // cm (Note: Need to calibrate, should be in % maybe.)
 
-double encoderTicksToCm(short nTicks) { // Note: Formula depends on wheel encoders
+inline double encoderTicksToCm(short nTicks) { // Note: Formula depends on wheel encoders
     return nTicks * 6.0 * M_PI * c_nWheelRadius / 1000.0;
 }
 
-short c_nMaxTurnSpeed = 200; // in same units as SRobotCommand.m_nSpeed*
-short c_nMaxFwdSpeed = 200;
+const short c_nMaxTurnSpeed = 200; // in same units as SRobotCommand.m_nSpeed*
+const short c_nMaxFwdSpeed = 200;
 
 #endif

@@ -9,28 +9,30 @@
 #ifndef occupancy_grid_h
 #define occupancy_grid_h
 
+#include "robot_controller_c.h"
+
 #include "nonmoveable.h"
 #include "geometry.h"
 
+#include <opencv2/core.hpp>
+
 namespace rbt {
     struct COccupancyGrid : rbt::nonmoveable {
-        COccupancyGrid(rbt::size<int> const& szn, int nScale) : m_szn(szn), m_nScale(nScale) {
-            assert(0==szn.x%2 && 0==szn.y%2);
-        }
-        
+        COccupancyGrid(rbt::size<int> const& szn, int nScale);        
         void update(point<double> const& ptf, double fYaw, int nAngle, int nDistance);
-
+        
+        point<int> toGridCoordinates(point<double> const& pt) const;
+        point<int> toWorldCoordinates(point<int> const& pt) const;
+    
+        struct SBitmap bitmap(bool bEroded) const;
+        
     private:
         rbt::size<int> m_szn;
         int m_nScale; // cm per pixel
         
-    public:
-        template<typename T>
-        point<int> toGridCoordinates(point<T> const& t) const {
-            return point<int>(t/m_nScale) + m_szn/2;
-        }
-        
-        point<int> toWorldCoordinates(point<int> const& pt) const;
+        cv::Mat m_matfMapLogOdds;
+        cv::Mat m_matnMapGreyscale;
+        cv::Mat m_matnMapEroded;
     };
 }
 #endif /* occupancy_grid_h */

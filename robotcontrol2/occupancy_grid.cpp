@@ -18,7 +18,6 @@
 #include <boost/range/size.hpp>
 
 namespace rbt {
-    
     double angularDistance( double fAngleA, double fAngleB) {
         auto fAngle = fAngleA - fAngleB;
         
@@ -160,37 +159,48 @@ namespace rbt {
         }
     };
 
+    COccupancyGrid::COccupancyGrid(rbt::size<int> const& szn, int nScale)
+    :   m_szn(szn), m_nScale(nScale),
+        m_matfMapLogOdds(m_szn.x, m_szn.y, CV_32FC1, 0.0f),
+        m_matnMapGreyscale(m_szn.x, m_szn.y, CV_8UC1, 128),
+        m_matnMapEroded(m_szn.x, m_szn.y, CV_8UC1, 128)
+    {
+        assert(0==szn.x%2 && 0==szn.y%2);
+    }
+
     
     void COccupancyGrid::update(point<double> const& ptf, double fYaw, int nAngle, int nDistance) {
         assert(nAngle==0 || std::abs(nAngle)==90);
         auto const fAngleSonar = fYaw + M_PI_2 * rbt::sign(nAngle);
         auto const ptnGrid = toGridCoordinates(ptf);
         
-        SArc arc{ptnGrid,
-                 fAngleSonar - c_fSonarOpeningAngle/2,
-                 fAngleSonar + c_fSonarOpeningAngle/2,
-                 (nDistance + c_fSonarDistanceTolerance/2)/m_nScale
-        };
-        
         auto const fSqrMaxDistance = rbt::sqr(c_fSonarMaxDistance/m_nScale);
         auto const fSqrMeasuredDistance = rbt::sqr((nDistance - c_fSonarDistanceTolerance/2)/m_nScale);
         
+        auto UpdateMap = [this](rbt::point<int> const& pt, float fValue) {
+            m_matfMapLogOdds.at<float>(pt.x, pt.y) = fValue;
+            auto const nColor = rbt::numeric_cast<std::uint8_t>(1.0 / ( 1.0 + std::exp( fValue )) * 255);
+            m_matnMapGreyscale.at<std::uint8_t>(pt.x, pt.y) = nColor;
+        };
+        
+        SArc arc{ptnGrid,
+            fAngleSonar - c_fSonarOpeningAngle/2,
+            fAngleSonar + c_fSonarOpeningAngle/2,
+            (nDistance + c_fSonarDistanceTolerance/2)/m_nScale
+        };
         arc.for_each_pixel([&](point<int> const& pt, double fSqrDistance) {
             if(fSqrDistance < fSqrMaxDistance) {
                 auto const fInverseSensorModel = fSqrDistance < fSqrMeasuredDistance
                     ? -0.5 // free
                     : (100.0 / m_nScale) / std::sqrt(fSqrDistance); // occupied
-                // TODO:
-                // UpdateGrid(x, y, self.grid[x][y] + fInverseSensorModel) // - prior which is 0
+
+                UpdateMap(pt, m_matfMapLogOdds.at<float>(pt.x, pt.y) + fInverseSensorModel); // - prior which is 0
             }
         });
         
         // Clear position of robot itself
         SRotatedRect rectRobot{ptnGrid, rbt::size<double>(c_nRobotWidth, c_nRobotHeight)/m_nScale, fYaw};
-        rectRobot.for_each_pixel([&](rbt::point<int> const& pt) {
-            // TODO:
-            // UpdateGrid(x, y, -100);
-        });
+        rectRobot.for_each_pixel([&](rbt::point<int> const& pt) { UpdateMap(pt, -100); });
         
         // Erode image
         // A pixel p in imageEroded is marked free when the robot centered at p does not occupy an occupied pixel in self.image
@@ -206,6 +216,22 @@ namespace rbt {
         */
     }
     
+    struct SBitmap COccupancyGrid::bitmap(bool bEroded) const {
+        auto const& matnMap = bEroded ? m_matnMapEroded : m_matnMapGreyscale;
+        SBitmap bitmap;
+        bitmap.m_pbImage = matnMap.data;
+        bitmap.m_cbBytesPerRow = bitmap.m_nWidth;
+        
+        bitmap.m_nWidth = m_szn.x;
+        bitmap.m_nHeight = m_szn.y;
+        bitmap.m_nScale = m_nScale;
+        return bitmap;
+    }    
+    
+    point<int> COccupancyGrid::toGridCoordinates(point<double> const& pt) const {
+        return point<int>(pt/m_nScale) + m_szn/2;
+    }
+
     point<int> COccupancyGrid::toWorldCoordinates(point<int> const& pt) const {
         return (pt - m_szn/2) * m_nScale;
     }
