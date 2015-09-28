@@ -50,19 +50,3 @@ struct SBitmap robot_get_map(struct CRobotController* probot, bool bEroded) {
     auto const& robotcontroller = *reinterpret_cast<rbt::CRobotController*>(probot);
     return robotcontroller.m_occgrid.bitmap(bEroded);
 }
-
-//
-//func withTimer(fn: () -> Void) {
-//    var timebase = mach_timebase_info_data_t()
-//    mach_timebase_info(&timebase)
-//    
-//    let tBegin = mach_absolute_time();
-//    
-//    fn()
-//    
-//    let tEnd = mach_absolute_time();
-//    let tNanoseconds = (tEnd - tBegin) * UInt64(timebase.numer) / UInt64(timebase.denom)
-//    
-//    NSLog("\(tNanoseconds / 1000000) ms")
-//}
-//

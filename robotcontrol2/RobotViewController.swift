@@ -8,6 +8,20 @@
 
 import Cocoa
 
+func withTimer(fn: () -> Void) {
+    var timebase = mach_timebase_info_data_t()
+    mach_timebase_info(&timebase)
+
+    let tBegin = mach_absolute_time();
+
+    fn()
+
+    let tEnd = mach_absolute_time();
+    let tNanoseconds = (tEnd - tBegin) * UInt64(timebase.numer) / UInt64(timebase.denom)
+
+    NSLog("\(tNanoseconds / 1000000) ms")
+}
+
 class RobotViewController: NSViewController {
 
     // View interface
@@ -79,9 +93,10 @@ class RobotViewController: NSViewController {
     func receivedSensorData(data: SSensorData) {
         log("Sensor data Z: \(data.m_nYaw) Sonar: \(data.m_nDistance) @ \(data.m_nAngle) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
         
-        let pose = robot_received_sensor_data(m_robotcontroller, data)
-        
-        m_apairptf.append( (CGPoint(x: pose.x, y: pose.y), CGFloat(pose.fYaw)) )
+        withTimer {
+            let pose = robot_received_sensor_data(self.m_robotcontroller, data)
+            self.m_apairptf.append( (CGPoint(x: pose.x, y: pose.y), CGFloat(pose.fYaw)) )
+        }
         m_bezierpath.lineToPoint(m_apairptf.last!.0)
         viewRender.needsDisplay = true
         

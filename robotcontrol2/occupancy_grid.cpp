@@ -16,6 +16,7 @@
 #include <unordered_map>
 
 #include <boost/range/size.hpp>
+#include <opencv2/imgproc.hpp>
 
 namespace rbt {
     double angularDistance( double fAngleA, double fAngleB) {
@@ -204,15 +205,11 @@ namespace rbt {
         // Erode image
         // A pixel p in imageEroded is marked free when the robot centered at p does not occupy an occupied pixel in self.image
         // i.e. the pixel p has the maximum value of the surrounding pixels inside the diameter defined by the robot's size
-        // We overestimate robot size by taking robot diagonal
-        /*
-        let nKernelDiameter = UInt( ceil( sqrt( pow(sizeRobot.width, 2) + pow(sizeRobot.height, 2) ) / scale ) )
-        let anKernel = [UInt8](count: Int(nKernelDiameter * nKernelDiameter), repeatedValue: 0)
-        var vimgbufInput = vImage_Buffer(data: image.bitmapData, height: UInt(image.pixelsHigh), width: UInt(image.pixelsWide), rowBytes: image.bytesPerRow)
-        var vimgbufOutput = vImage_Buffer(data: imageEroded.bitmapData, height: UInt(image.pixelsHigh), width: UInt(image.pixelsWide), rowBytes: image.bytesPerRow)
-        
-        vImageErode_Planar8( &vimgbufInput, &vimgbufOutput, 0, 0, anKernel, nKernelDiameter, nKernelDiameter, UInt32(kvImageNoFlags) )
-        */
+        // We overestimate robot size by taking robot diagonal        
+        static const int s_nKernelDiameter =
+            rbt::numeric_cast<int>(std::ceil(std::sqrt(rbt::size<int>(c_nRobotWidth, c_nRobotHeight).SqrAbs()) / m_nScale));
+        static const cv::Mat s_matnKernel = cv::Mat(s_nKernelDiameter, s_nKernelDiameter, CV_8UC1, 1);
+        cv::erode(m_matnMapGreyscale, m_matnMapEroded, s_matnKernel);
     }
     
     struct SBitmap COccupancyGrid::bitmap(bool bEroded) const {
