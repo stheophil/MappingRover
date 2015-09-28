@@ -27,7 +27,7 @@ namespace rbt {
         assert(std::numeric_limits<Dst>::lowest()<=t && t<=std::numeric_limits<Dst>::max());
         std::feclearexcept(FE_ALL_EXCEPT);
         auto tRounded = std::lround(t);
-        assert(0==std::fetestexcept(FE_ALL_EXCEPT));
+        assert(0==std::fetestexcept(FE_INVALID));
         
         assert(std::numeric_limits<Dst>::lowest()<=tRounded && tRounded<=std::numeric_limits<Dst>::max());
         return static_cast<Dst>(tRounded);

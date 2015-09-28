@@ -89,9 +89,9 @@ namespace rbt {
     template<typename T>
     struct rect {
         T left;
-        T top;
-        T right;
         T bottom;
+        T right;
+        T top;
         
         static rect<T> empty(); // neutral element for operator|=
         static rect<T> bound(std::initializer_list<point<T>> const& cpt);
@@ -217,9 +217,9 @@ namespace rbt {
     template<typename T>
     rect<T>& rect<T>::operator|=(rbt::point<T> const& pt) {
         left = std::min(left, pt.x);
+        bottom = std::min(bottom, pt.y);
         right = std::max(right, pt.x);
-        top = std::min(top, pt.y);
-        bottom = std::max(bottom, pt.y);
+        top = std::max(top, pt.y);
         return *this;
     }
     

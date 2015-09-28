@@ -70,7 +70,7 @@ namespace rbt {
             }
             
             auto fSqrRadius = rbt::sqr(m_fRadius);
-            for(int y = rectnBound.top; y <= rectnBound.bottom; ++y) { // both-inclusive
+            for(int y = rectnBound.bottom; y <= rectnBound.top; ++y) { // both-inclusive
                 // Scan bound rect lines in y-direction for interval between vectors szFrom and szTo
                 // Since arcs are convex, there is (exactly) one contiguous sequence of pixels
                 // that fall into the arc. Therefore, we can stop processing a line once we
@@ -131,11 +131,10 @@ namespace rbt {
                             foreach(x, rbt::numeric_cast<int>(ptA.y + m * (x - ptA.x)));
                         }
                     } else { // y-step
-                        if(ptB.y < ptA.y) {
-                            std::swap(ptB, ptA);
-                        }
-                        for(int y = ptA.y; y <= ptB.y; ++y) {
-                            foreach(rbt::numeric_cast<int>(ptA.x + (y - ptB.y) / m), y);
+                        auto nMin = std::min(ptA.y, ptB.y);
+                        auto nMax = std::max(ptA.y, ptB.y);
+                        for(int y = nMin; y <= nMax; ++y) {
+                            foreach(rbt::numeric_cast<int>(ptA.x + (y - ptA.y) / m), y);
                         }
                     }
                 }
@@ -152,7 +151,7 @@ namespace rbt {
                 });
             }
             boost::for_each(mapnintvlX, [&](auto const& pairnintvlX) {
-                for(int x = pairnintvlX.second.begin; x <= pairnintvlX.second.begin; ++x) {
+                for(int x = pairnintvlX.second.begin; x <= pairnintvlX.second.end; ++x) {
                     foreach(rbt::point<int>(x, pairnintvlX.first));
                 }
             });
@@ -178,9 +177,9 @@ namespace rbt {
         auto const fSqrMeasuredDistance = rbt::sqr((nDistance - c_fSonarDistanceTolerance/2)/m_nScale);
         
         auto UpdateMap = [this](rbt::point<int> const& pt, float fValue) {
-            m_matfMapLogOdds.at<float>(pt.x, pt.y) = fValue;
+            m_matfMapLogOdds.at<float>(pt.y, pt.x) = fValue;
             auto const nColor = rbt::numeric_cast<std::uint8_t>(1.0 / ( 1.0 + std::exp( fValue )) * 255);
-            m_matnMapGreyscale.at<std::uint8_t>(pt.x, pt.y) = nColor;
+            m_matnMapGreyscale.at<std::uint8_t>(pt.y, pt.x) = nColor;
         };
         
         SArc arc{ptnGrid,
@@ -194,7 +193,7 @@ namespace rbt {
                     ? -0.5 // free
                     : (100.0 / m_nScale) / std::sqrt(fSqrDistance); // occupied
 
-                UpdateMap(pt, m_matfMapLogOdds.at<float>(pt.x, pt.y) + fInverseSensorModel); // - prior which is 0
+                UpdateMap(pt, m_matfMapLogOdds.at<float>(pt.y, pt.x) + fInverseSensorModel); // - prior which is 0
             }
         });
         
@@ -220,7 +219,7 @@ namespace rbt {
         auto const& matnMap = bEroded ? m_matnMapEroded : m_matnMapGreyscale;
         SBitmap bitmap;
         bitmap.m_pbImage = matnMap.data;
-        bitmap.m_cbBytesPerRow = bitmap.m_nWidth;
+        bitmap.m_cbBytesPerRow = m_szn.x;
         
         bitmap.m_nWidth = m_szn.x;
         bitmap.m_nHeight = m_szn.y;

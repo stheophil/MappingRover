@@ -12,12 +12,12 @@ extern "C" {
 struct CRobotController;
 struct CRobotController* robot_new_controller();
 
-// Returns new robot pose. The x,y coordinates are in coordinates of the
-// internal maps, i.e., they may be scaled.
+// Returns new robot pose. The x,y coordinates are in world coordinates, i.e.,
+// not scaled according to occupancy grid resolution.
 // The yaw angle is returned in radians.
 struct SPose {
-    int x;
-    int y;
+    double x;
+    double y;
     double fYaw;
 };
 struct SPose robot_received_sensor_data(struct CRobotController* probot, struct SSensorData data);

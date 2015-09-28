@@ -23,6 +23,7 @@ class RobotViewController: NSViewController {
         
         m_bezierpath.moveToPoint(NSPoint(x: 0, y: 0))
         
+        // Enable the timer and method onTimer to generate test data
         // NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("onTimer"), userInfo: nil, repeats: true)
         
         assert(sizeof(SSensorData)==18)
@@ -80,7 +81,7 @@ class RobotViewController: NSViewController {
         
         let pose = robot_received_sensor_data(m_robotcontroller, data)
         
-        m_apairptf.append( (CGPoint(x: Int(pose.x), y: Int(pose.y)), CGFloat(pose.fYaw)) )
+        m_apairptf.append( (CGPoint(x: pose.x, y: pose.y), CGFloat(pose.fYaw)) )
         m_bezierpath.lineToPoint(m_apairptf.last!.0)
         viewRender.needsDisplay = true
         

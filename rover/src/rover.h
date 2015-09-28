@@ -25,17 +25,19 @@ struct SSensorData { // must be < 64 bytes
 };
 
 inline double yawToRadians(short nYaw) {
-    return -nYaw/1000.0;
+    return -nYaw/1000.0; // on-board yaw measurement is flipped, i.e. not in counter-clockwise direction
 }
 
 // Robot configuration
-
 const int c_nRobotWidth = 30; // cm
 const int c_nRobotHeight = 30; // cm
 
 const int c_nWheelRadius = 6; // cm
 
-const int c_anSonarOffset[] = {6, 7, 2}; // cm for -90, 0, 90 Angle
+// Distance from robot center in cm
+// for sensor with -90, 0, 90.
+// TODO: Wrong offsets? Rotation is CCW.
+const int c_anSonarOffset[] = {6, 7, 2};
 
 inline int sonarOffset(short nAngle) {
     assert(nAngle==0 || abs(nAngle)==90);

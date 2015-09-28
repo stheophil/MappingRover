@@ -25,8 +25,8 @@ namespace rbt {
                 ptf = ptfPrev + rbt::size<double>::fromAngleAndDistance(fYaw, encoderTicksToCm(data.m_anEncoderTicks[0]));
             }
             
-            m_vecpairptfPose.emplace_back(std::make_pair(ptf, yawToRadians(data.m_nYaw)));
-            m_occgrid.update(ptf, fYaw, data.m_nAngle, data.m_nDistance + sonarOffset(data.m_nAngle));
+            m_vecpairptfPose.emplace_back(std::make_pair(ptf, fYaw));
+            m_occgrid.update(ptf, fYaw, data.m_nAngle, data.m_nDistance + sonarOffset(data.m_nAngle)); // TODO: Add sonarOffset to position instead?
         }
         
         rbt::COccupancyGrid m_occgrid;
@@ -43,8 +43,7 @@ struct SPose robot_received_sensor_data(struct CRobotController* probot, struct 
     auto& robotcontroller = *reinterpret_cast<rbt::CRobotController*>(probot);
     robotcontroller.receivedSensorData(data);
     auto const& pairptfPose = robotcontroller.m_vecpairptfPose.back();
-    auto ptnGrid = robotcontroller.m_occgrid.toGridCoordinates(pairptfPose.first);
-    return { ptnGrid.x, ptnGrid.y, pairptfPose.second };
+    return { pairptfPose.first.x, pairptfPose.first.y, pairptfPose.second };
 }
 
 struct SBitmap robot_get_map(struct CRobotController* probot, bool bEroded) {
