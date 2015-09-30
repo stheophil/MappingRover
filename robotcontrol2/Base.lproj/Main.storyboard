@@ -682,13 +682,10 @@
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="HTx-LB-1Eb" customClass="QuartzView" customModule="robotcontrol2" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="324" height="207"/>
                                             </customView>
-                                            <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AI7-bg-1Dn">
-                                                <rect key="frame" x="332" y="147" width="148" height="40"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="40" id="Bec-81-Y2L"/>
-                                                </constraints>
+                                            <matrix verticalHuggingPriority="750" misplaced="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AI7-bg-1Dn">
+                                                <rect key="frame" x="332" y="97" width="148" height="90"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                <size key="cellSize" width="101" height="18"/>
+                                                <size key="cellSize" width="148" height="21"/>
                                                 <size key="intercellSpacing" width="4" height="2"/>
                                                 <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="FwA-bQ-lN0">
                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -704,8 +701,19 @@
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <buttonCell type="radio" title="Edge Map" imagePosition="left" alignment="left" tag="2" inset="2" id="XHF-9y-ETR">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <buttonCell type="radio" title="Features" imagePosition="left" alignment="left" tag="3" inset="2" id="1YW-ux-SoX">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
                                                     </column>
                                                 </cells>
+                                                <connections>
+                                                    <action selector="onMapSelection:" target="XfG-lQ-9wD" id="eIV-5q-uCa"/>
+                                                </connections>
                                             </matrix>
                                         </subviews>
                                         <constraints>
@@ -725,11 +733,11 @@
                                             <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kN3-Ou-Ld7">
                                                 <rect key="frame" x="0.0" y="0.0" width="500" height="216"/>
                                                 <clipView key="contentView" id="ClZ-6h-1D2">
-                                                    <rect key="frame" x="1" y="1" width="223" height="133"/>
+                                                    <rect key="frame" x="1" y="1" width="498" height="214"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textView editable="NO" importsGraphics="NO" richText="NO" findStyle="panel" verticallyResizable="YES" id="qav-DC-KA4">
-                                                            <rect key="frame" x="0.0" y="0.0" width="223" height="214"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="498" height="214"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <size key="minSize" width="498" height="214"/>

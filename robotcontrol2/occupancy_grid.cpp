@@ -41,11 +41,13 @@ namespace rbt {
         
         template<class Func>
         void for_each_pixel(Func foreach) const {
+            // TODO: Approximate arc with lines, use cv::LineIterator instead
             auto szFrom = rbt::size<int>::fromAngleAndDistance(m_fAngleFrom, m_fRadius);
             auto szTo = rbt::size<int>::fromAngleAndDistance(m_fAngleTo, m_fRadius);
             
             assert(angularDistance(m_fAngleFrom, m_fAngleTo)<M_PI/2);
-            assert(szFrom.compare(szTo) != 0);
+            // This can happen because szFrom and szTo are already cast to int coordinates:
+            // assert(szFrom.compare(szTo) != 0);
             
             if(szFrom.compare(szTo) < 0) { // ptFrom should be left of ptTo
                 std::swap(szFrom, szTo);
@@ -105,6 +107,7 @@ namespace rbt {
             // Rotate the scaled rectangle.
             // TODO: For numerical precision, it may be better to rotate the rect
             // in world coordinates and then scale.
+            // TODO: Use cv::LineIterator instead
             rbt::point<int> apt[] = {
                 m_ptnCenter - rbt::size<int>((m_szf/2).rotated(m_fAngle)),
                 m_ptnCenter + rbt::size<int>((rbt::size<double>(m_szf.x, -m_szf.y)/2).rotated(m_fAngle)),
@@ -211,18 +214,6 @@ namespace rbt {
         static const cv::Mat s_matnKernel = cv::Mat(s_nKernelDiameter, s_nKernelDiameter, CV_8UC1, 1);
         cv::erode(m_matnMapGreyscale, m_matnMapEroded, s_matnKernel);
     }
-    
-    struct SBitmap COccupancyGrid::bitmap(bool bEroded) const {
-        auto const& matnMap = bEroded ? m_matnMapEroded : m_matnMapGreyscale;
-        SBitmap bitmap;
-        bitmap.m_pbImage = matnMap.data;
-        bitmap.m_cbBytesPerRow = m_szn.x;
-        
-        bitmap.m_nWidth = m_szn.x;
-        bitmap.m_nHeight = m_szn.y;
-        bitmap.m_nScale = m_nScale;
-        return bitmap;
-    }    
     
     point<int> COccupancyGrid::toGridCoordinates(point<double> const& pt) const {
         return point<int>(pt/m_nScale) + m_szn/2;

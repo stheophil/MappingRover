@@ -20,6 +20,7 @@
 		9EB81AB51BB69F0300CF417F /* libopencv_core.3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EB81AB41BB69F0300CF417F /* libopencv_core.3.0.0.dylib */; };
 		9ED482951BB962F8001A3968 /* libopencv_imgproc.3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ED482941BB962F8001A3968 /* libopencv_imgproc.3.0.0.dylib */; };
 		9ED9A9811BB094A700843215 /* robot_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED9A9801BB094A700843215 /* robot_controller.cpp */; settings = {ASSET_TAGS = (); }; };
+		9EE74C871BBB21D100274281 /* edge_following_strategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EE74C851BBB21D100274281 /* edge_following_strategy.cpp */; settings = {ASSET_TAGS = (); }; };
 		9EF738C21BB4849700E06378 /* occupancy_grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF738C11BB4849700E06378 /* occupancy_grid.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
@@ -50,6 +51,8 @@
 		9ED482941BB962F8001A3968 /* libopencv_imgproc.3.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_imgproc.3.0.0.dylib; path = ../../../../usr/local/Cellar/opencv3/3.0.0/lib/libopencv_imgproc.3.0.0.dylib; sourceTree = "<group>"; };
 		9ED9A97F1BAF477F00843215 /* robot_controller_c.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = robot_controller_c.h; sourceTree = "<group>"; };
 		9ED9A9801BB094A700843215 /* robot_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = robot_controller.cpp; sourceTree = "<group>"; };
+		9EE74C851BBB21D100274281 /* edge_following_strategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = edge_following_strategy.cpp; sourceTree = "<group>"; };
+		9EE74C861BBB21D100274281 /* edge_following_strategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = edge_following_strategy.h; sourceTree = "<group>"; };
 		9EF738BC1BB471C400E06378 /* geometry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = geometry.h; sourceTree = "<group>"; };
 		9EF738BD1BB472CD00E06378 /* nonmoveable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nonmoveable.h; sourceTree = "<group>"; };
 		9EF738BF1BB47A1900E06378 /* math.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = math.h; sourceTree = "<group>"; };
@@ -104,6 +107,8 @@
 				9ED9A9801BB094A700843215 /* robot_controller.cpp */,
 				9EF738C01BB4824700E06378 /* occupancy_grid.h */,
 				9EF738C11BB4849700E06378 /* occupancy_grid.cpp */,
+				9EE74C861BBB21D100274281 /* edge_following_strategy.h */,
+				9EE74C851BBB21D100274281 /* edge_following_strategy.cpp */,
 				9EF738BF1BB47A1900E06378 /* math.h */,
 				9EF738BD1BB472CD00E06378 /* nonmoveable.h */,
 				9EF738BC1BB471C400E06378 /* geometry.h */,
@@ -248,6 +253,7 @@
 				9E39FBC21A20D163002D6835 /* QuartzView.swift in Sources */,
 				9E39FBA51A20CB82002D6835 /* RobotViewController.swift in Sources */,
 				9ED9A9811BB094A700843215 /* robot_controller.cpp in Sources */,
+				9EE74C871BBB21D100274281 /* edge_following_strategy.cpp in Sources */,
 				9EF738C21BB4849700E06378 /* occupancy_grid.cpp in Sources */,
 				9E39FBA31A20CB82002D6835 /* AppDelegate.swift in Sources */,
 				9E1529951A28E49800FE55D3 /* BLE.swift in Sources */,

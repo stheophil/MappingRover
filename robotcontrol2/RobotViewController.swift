@@ -109,17 +109,17 @@ class RobotViewController: NSViewController {
     
     func draw() {
         let btnSelected = radiobtnShowMap.selectedCell() as! NSButtonCell
-        let bShowErodedMap = btnSelected.tag == 1
-        
-        var bitmap = robot_get_map(m_robotcontroller, bShowErodedMap)
+        let type = bitmap_type(UInt32(btnSelected.tag))
+
+        var bitmap = robot_get_map(m_robotcontroller, type)
         if let bitmaprep = NSBitmapImageRep(bitmapDataPlanes: &bitmap.m_pbImage,
             pixelsWide: bitmap.m_nWidth,
             pixelsHigh: bitmap.m_nHeight,
             bitsPerSample: 8,
-            samplesPerPixel: 1,
+            samplesPerPixel: bitmap.m_cChannels,
             hasAlpha: false,
             isPlanar: false,
-            colorSpaceName: NSDeviceWhiteColorSpace,
+            colorSpaceName: (bitmap.m_cChannels==3 ? NSDeviceRGBColorSpace : NSDeviceWhiteColorSpace),
             bytesPerRow: bitmap.m_cbBytesPerRow,
             bitsPerPixel: 0) {
                 
@@ -151,6 +151,10 @@ class RobotViewController: NSViewController {
         // textview.scrollRangeToVisible(NSMakeRange(textview.string!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding), 0))
     }
 
+    @IBAction func onMapSelection(sender: AnyObject) {
+        viewRender.needsDisplay = true
+    }
+    
     var m_robotcontroller : COpaquePointer = nil
     var m_apairptf = [(CGPoint, CGFloat)]()
     var m_bezierpath = NSBezierPath()

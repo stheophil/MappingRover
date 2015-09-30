@@ -23,13 +23,14 @@ namespace rbt {
         
         point<int> toGridCoordinates(point<double> const& pt) const;
         point<int> toWorldCoordinates(point<int> const& pt) const;
-    
-        struct SBitmap bitmap(bool bEroded) const;
+        
+        cv::Mat const& GreyscaleMap() const { return m_matnMapGreyscale; }
+        cv::Mat const& ErodedMap() const { return m_matnMapEroded; }
+        
+        rbt::size<int> const m_szn;
+        int const m_nScale; // cm per pixel
         
     private:
-        rbt::size<int> m_szn;
-        int m_nScale; // cm per pixel
-        
         cv::Mat m_matfMapLogOdds;
         cv::Mat m_matnMapGreyscale;
         cv::Mat m_matnMapEroded;
