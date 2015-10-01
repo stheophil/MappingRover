@@ -11,6 +11,7 @@
 
 #include <boost/operators.hpp>
 #include <boost/range/algorithm/for_each.hpp>
+#include <opencv2/core.hpp>
 
 #include <cstdint>
 #include <cmath>
@@ -41,6 +42,9 @@ namespace rbt {
         explicit point(point<S> const& pt) : x(rbt::numeric_cast<T>(pt.x)), y(rbt::numeric_cast<T>(pt.y))
         {}
         
+        explicit point(cv::Point_<T> const& pt) : x(pt.x), y(pt.y)
+        {}
+        
         static point<T> zero() { return point(0, 0); }
         
         point<T>& operator+=(size<T> const& sz);
@@ -51,6 +55,8 @@ namespace rbt {
         
         size<T> operator-(point<T> const& rhs) const;
         bool operator==(point<T> const& rhs) const;
+        
+        operator cv::Point_<T>() const;
     };
     
     template<typename T>
@@ -104,6 +110,7 @@ namespace rbt {
         T begin;
         T end;
         
+        interval() = default;
         interval(T _begin, T _end) : begin(_begin), end(_end) {}
         
         interval<T>& operator|=(T const& t);
@@ -135,6 +142,11 @@ namespace rbt {
         x /= t;
         y /= t;
         return *this;
+    }
+
+    template<typename T>
+    point<T>::operator cv::Point_<T>() const {
+        return cv::Point_<T>(x, y);
     }
     
     template<typename T>

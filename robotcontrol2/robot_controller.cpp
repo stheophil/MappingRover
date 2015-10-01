@@ -27,8 +27,11 @@ namespace rbt {
             }
             
             m_vecpairptfPose.emplace_back(std::make_pair(ptf, fYaw));
-            m_occgrid.update(ptf, fYaw, data.m_nAngle, data.m_nDistance + sonarOffset(data.m_nAngle)); // TODO: Add sonarOffset to position instead?
-            m_edgefollow.update(ptf, fYaw, m_occgrid);
+            m_occgrid.update(ptf,
+                             fYaw,
+                             data.m_nAngle,
+                             data.m_nDistance + sonarOffset(data.m_nAngle)); // TODO: Add sonarOffset to position instead?
+            m_edgefollow.update(ptfPrev, ptf, fYaw, m_occgrid);
         }
         
         rbt::COccupancyGrid m_occgrid;
@@ -57,7 +60,7 @@ struct SBitmap robot_get_map(struct CRobotController* probot, bitmap_type bm) {
         switch(bm) {
             case bitmap_type::greyscale: return robotcontroller.m_occgrid.GreyscaleMap().data;
             case bitmap_type::eroded: return robotcontroller.m_occgrid.ErodedMap().data;
-            case bitmap_type::edges: return robotcontroller.m_edgefollow.EdgeMap().data;
+            case bitmap_type::edges: return robotcontroller.m_occgrid.ErodedMap().data;
             case bitmap_type::features: return robotcontroller.m_edgefollow.FeatureRGBMap().data;
         }
     }();
