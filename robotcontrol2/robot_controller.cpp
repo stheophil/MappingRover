@@ -14,7 +14,7 @@ namespace rbt {
             : m_occgrid(rbt::size<int>(400, 400), /*nScale*/5) // = Map of 20m x 20m map
         {}
         
-        void receivedSensorData(SSensorData const& data) {
+        SRobotCommand receivedSensorData(SSensorData const& data) {
             auto const fYaw = yawToRadians(data.m_nYaw); // TODO: Fuse odometry and IMU sensors?
             
             auto const ptfPrev = m_vecpairptfPose.empty() ? rbt::point<double>::zero() : m_vecpairptfPose.back().first;
@@ -26,12 +26,18 @@ namespace rbt {
                 ptf = ptfPrev + rbt::size<double>::fromAngleAndDistance(fYaw, encoderTicksToCm(data.m_anEncoderTicks[0]));
             }
             
-            m_vecpairptfPose.emplace_back(std::make_pair(ptf, fYaw));
             m_occgrid.update(ptf,
                              fYaw,
                              data.m_nAngle,
                              data.m_nDistance + sonarOffset(data.m_nAngle)); // TODO: Add sonarOffset to position instead?
-            m_edgefollow.update(ptfPrev, ptf, fYaw, m_occgrid);
+            auto rcmd = m_edgefollow.update(ptfPrev,
+                                            ptf,
+                                            m_vecpairptfPose.empty() ? fYaw : m_vecpairptfPose.back().second,
+                                            fYaw,
+                                            m_occgrid);
+            
+            m_vecpairptfPose.emplace_back(std::make_pair(ptf, fYaw));
+            return rcmd;
         }
         
         rbt::COccupancyGrid m_occgrid;
@@ -45,9 +51,9 @@ struct CRobotController* robot_new_controller() {
     return reinterpret_cast<::CRobotController*>(&g_robotcontroller);
 }
 
-struct SPose robot_received_sensor_data(struct CRobotController* probot, struct SSensorData data) {
+struct SPose robot_received_sensor_data(struct CRobotController* probot, struct SSensorData data, struct SRobotCommand* prcmd) {
     auto& robotcontroller = *reinterpret_cast<rbt::CRobotController*>(probot);
-    robotcontroller.receivedSensorData(data);
+    *prcmd = robotcontroller.receivedSensorData(data);
     auto const& pairptfPose = robotcontroller.m_vecpairptfPose.back();
     return { pairptfPose.first.x, pairptfPose.first.y, pairptfPose.second };
 }

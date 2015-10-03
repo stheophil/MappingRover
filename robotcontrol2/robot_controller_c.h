@@ -20,7 +20,7 @@ struct SPose {
     double y;
     double fYaw;
 };
-struct SPose robot_received_sensor_data(struct CRobotController* probot, struct SSensorData data);
+struct SPose robot_received_sensor_data(struct CRobotController* probot, struct SSensorData data, struct SRobotCommand* prcmd);
 
 // Returns pointer to the current robot maps as bitmaps.
 // Returns either the raw map (bEroded = false)

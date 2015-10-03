@@ -52,7 +52,7 @@ inline double encoderTicksToCm(short nTicks) { // Note: Formula depends on wheel
     return nTicks * 6.0 * M_PI * c_nWheelRadius / 1000.0;
 }
 
-const short c_nMaxTurnSpeed = 200; // in same units as SRobotCommand.m_nSpeed*
+const short c_nMaxTurnSpeed = 80; // in same units as SRobotCommand.m_nSpeed*
 const short c_nMaxFwdSpeed = 200;
 
 #endif

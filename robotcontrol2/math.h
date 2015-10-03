@@ -51,6 +51,8 @@ namespace rbt {
     T sqr(T const& t) { // TODO: introduce rbt::sqr_type<T>, so int * int -> int64?
         return t*t;
     }
+    
+    double angularDistance( double fAngleA, double fAngleB);
 }
 
 #endif /* math_h */

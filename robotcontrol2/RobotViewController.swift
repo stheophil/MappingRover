@@ -94,8 +94,10 @@ class RobotViewController: NSViewController {
         log("Sensor data Z: \(data.m_nYaw) Sonar: \(data.m_nDistance) @ \(data.m_nAngle) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
         
         withTimer {
-            let pose = robot_received_sensor_data(self.m_robotcontroller, data)
+            var rcmd = SRobotCommand(m_cmd: ecmdSTOP, m_nSpeedLeft: 0, m_nSpeedRight: 0)
+            let pose = robot_received_sensor_data(self.m_robotcontroller, data, &rcmd)
             self.m_apairptf.append( (CGPoint(x: pose.x, y: pose.y), CGFloat(pose.fYaw)) )
+            self.sendCommand(rcmd)
         }
         m_bezierpath.lineToPoint(m_apairptf.last!.0)
         viewRender.needsDisplay = true

@@ -46,6 +46,7 @@ namespace rbt {
         {}
         
         static point<T> zero() { return point(0, 0); }
+        static point<T> invalid() { return point(std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest()); }
         
         point<T>& operator+=(size<T> const& sz);
         point<T>& operator-=(size<T> const& sz);
@@ -81,11 +82,12 @@ namespace rbt {
         size<T>& operator*=(T t);
         size<T>& operator/=(T t);
         
+        T operator*(size<T> const& rhs) const;
+        
         // < 0 -> v is left of this
         // > 0 -> v is right of this
         int compare(size const& sz) const;
         int quadrant() const;
-        
         size<T> rotated(double fAngle) const;
             
         T Abs() const;
@@ -178,7 +180,12 @@ namespace rbt {
         y /= t;
         return *this;
     }
-
+    
+    template<typename T>
+    T size<T>::operator*(size<T> const& rhs) const {
+        return x*rhs.x + y*rhs.y;
+    }
+    
     template<typename T>
     int size<T>::compare(size<T> const& sz) const {
         auto d = y * sz.x - x * sz.y;
