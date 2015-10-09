@@ -40,8 +40,8 @@ class RobotViewController: NSViewController {
         // Enable the timer and method onTimer to generate test data
         // NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: Selector("onTimer"), userInfo: nil, repeats: true)
         
-        assert(sizeof(SSensorData)==18)
-        assert(sizeof(SRobotCommand)==8)
+        assert(sizeof(SSensorData)==16)
+        assert(sizeof(SRobotCommand)==6)
     }
 
     /*
@@ -75,29 +75,32 @@ class RobotViewController: NSViewController {
     }
     
     func moveForward() {
-        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: c_nMaxFwdSpeed, m_nSpeedRight: c_nMaxFwdSpeed))
+        sendCommand(c_rcmdForward)
     }
     
     func moveBackward() {
-        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: -c_nMaxFwdSpeed, m_nSpeedRight: -c_nMaxFwdSpeed))
+        sendCommand(c_rcmdBackward)
     }
     
     func turnLeft() {
-        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: -c_nMaxTurnSpeed, m_nSpeedRight: c_nMaxTurnSpeed))
+        sendCommand(c_rcmdTurnLeft)
     }
     
     func turnRight() {
-        sendCommand(SRobotCommand(m_cmd: ecmdMOVE, m_nSpeedLeft: c_nMaxTurnSpeed, m_nSpeedRight: -c_nMaxTurnSpeed))
+        sendCommand(c_rcmdTurnRight)
     }
     
     func receivedSensorData(data: SSensorData) {
-        log("Sensor data Z: \(data.m_nYaw) Sonar: \(data.m_nDistance) @ \(data.m_nAngle) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3)\n")
+        log("Sensor data Z: \(data.m_nYaw) Sonar: \(data.m_nDistance) @ \(data.m_nAngle) Distances: \(data.m_anEncoderTicks.0), \(data.m_anEncoderTicks.1), \(data.m_anEncoderTicks.2), \(data.m_anEncoderTicks.3) Cmd: \(data.m_ecmdLast)\n")
         
         withTimer {
-            var rcmd = SRobotCommand(m_cmd: ecmdSTOP, m_nSpeedLeft: 0, m_nSpeedRight: 0)
-            let pose = robot_received_sensor_data(self.m_robotcontroller, data, &rcmd)
+            var rcmd = c_rcmdStop;
+            var bSend = false;
+            let pose = robot_received_sensor_data(self.m_robotcontroller, data, &rcmd, &bSend)
             self.m_apairptf.append( (CGPoint(x: pose.x, y: pose.y), CGFloat(pose.fYaw)) )
+            if bSend {
             self.sendCommand(rcmd)
+        }
         }
         m_bezierpath.lineToPoint(m_apairptf.last!.0)
         viewRender.needsDisplay = true

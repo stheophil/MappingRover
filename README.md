@@ -4,6 +4,8 @@
 
 The folder `rover` contains the code for the vehicle. It used the [inotool](http://inotool.org) build tool. _inotool_ has been unmaintained for quite some time and it doesn't work with the latest versions of the Arduino IDE. There is a more current form called [Arturo](https://github.com/scottdarch/Arturo) that I haven't had time to check out yet.
 
+In the meantime, [download version 1.0.5 of the Arduino IDE](https://www.arduino.cc/en/Main/OldSoftwareReleases#1.0.x). inotool works fine with it. You may need to delete the RobotControl Arduino library, [see this thread](http://forum.arduino.cc/index.php?topic=168854.0), if you get compilation errors.
+
 The rover is based on the [Dagu Rover 5 platform](https://www.pololu.com/product/1551) with 4 motors and encoders, an [Arduino Mega](http://arduino.cc/en/pmwiki.php?n=Main/ArduinoBoardMega), a [Redbear BLE Shield](http://redbearlab.com/bleshield/), 3 [SR04 sonar sensors](http://www.amazon.com/SainSmart-HC-SR04-Ranging-Detector-Distance/dp/B004U8TOE6) and the [Polulo MinIMU compass and gyro](https://www.pololu.com/product/2468). See [letsmakerobots.com](http://letsmakerobots.com/robot/project/mapping-rover-the-classic-rover-5-with-improved-3d-printed-axis-adaptors) for a full description. 
 
 To build the project you need the [L3G](https://github.com/pololu/l3g-arduino), [LSM303 libraries](https://github.com/pololu/lsm303-arduino) for the MinIMU and the [Bluetooth libraries provided by Redbearlab](http://redbearlab.com/getting-started-bleshield).

@@ -8,14 +8,13 @@
 
 #include "edge_following_strategy.h"
 #include <opencv2/imgproc.hpp>
+#include <iostream>
 
 namespace rbt {
-    SRobotCommand c_rcmdStop{ecmdSTOP, 0, 0};
-    SRobotCommand c_rcmdTurnLeft{ecmdMOVE, -c_nMaxTurnSpeed, c_nMaxTurnSpeed};
-    SRobotCommand c_rcmdTurnRight{ecmdMOVE, c_nMaxTurnSpeed, -c_nMaxTurnSpeed};
-    SRobotCommand c_rcmdForward{ecmdMOVE, c_nMaxFwdSpeed, c_nMaxFwdSpeed};
-    
-    SRobotCommand CEdgeFollowingStrategy::update(point<double> const& ptfPrev, point<double> const& ptf, double fYawPrev, double fYaw, COccupancyGrid const& occgrid) {
+    boost::optional<SRobotCommand> CEdgeFollowingStrategy::update(point<double> const& ptfPrev, point<double> const& ptf,
+                                                                  double fYawPrev, double fYaw,
+                                                                  ECommand ecmdLast,
+                                                                  COccupancyGrid const& occgrid) {
         // Threshold first, converting eroded map to black & white. Decision to drive to a position is essentially binary.
         // Either we can drive someplace or we can't.
         cv::threshold(occgrid.ErodedMap(), m_matnMapThreshold, /* pixels >= */ 255*0.4, /* are set to */ 255, cv::THRESH_BINARY);
@@ -43,47 +42,43 @@ namespace rbt {
         // New control command
         if(rbt::point<int>::invalid() == m_ptnTarget) {
             if(state::stopped == m_estate) { // Make 360 degree turn
-                m_fYawTarget = fYaw;
-                m_estate = state::turning_left;
-                return c_rcmdTurnLeft;
-            } else if(state::turning_left == m_estate) {
-                // let fYawPrev = yawToRadians(self.m_apairsdatapt[self.m_apairsdatapt.count - 2].0.m_nYaw);
-                if(0 < rbt::angularDistance(m_fYawTarget, fYawPrev)
-                && 0 < rbt::angularDistance(fYaw, m_fYawTarget)) { // finished 360 deg turn
+                m_estate = state::start_turning;
+                std::cout << "Make 360 turn to " << fYaw << std::endl;
+                return c_rcmdTurn360;
+            } else if(state::start_turning == m_estate) {
+                if(ecmdTURN360==ecmdLast) {
+                    m_estate = state::turning;
+                    std::cout << "Started 360 turn." << std::endl;
+                }
+            } else if(state::turning == m_estate) {
+                if(ecmdSTOP==ecmdLast) {
                     m_estate = state::stopped_after_turn;
-                    return c_rcmdStop;
-                } else {
-                    return c_rcmdTurnLeft;
+                    std::cout << "Stopped 360 turn." << std::endl;
                 }
             } else { // else state::stopped_after_turn, try to find new target, else stay still.
+                assert(state::stopped_after_turn == m_estate);
                 FindNewTarget(ptf, occgrid, nMaxExplorationDistance);
+                std::cout << "FindNewTarget after 360 turn." << std::endl;
+                if(rbt::point<int>::invalid() == m_ptnTarget) std::cout << "No new target found!" << std::endl;
                 return c_rcmdStop;
             }
         } else {
             auto const szMove = m_ptnTarget - ptn;
             auto const fYawTarget = std::atan2(szMove.y, szMove.x);
-            auto const fAngle = rbt::angularDistance(fYaw, fYawTarget);
             
             if(state::stopped == m_estate || state::stopped_after_turn==m_estate) {
-                if(fAngle<=0) {
-                    m_estate = state::turning_left;
-                    if(fAngle<0) return c_rcmdTurnLeft;
-                } else {
-                    m_estate = state::turning_right;
-                    return c_rcmdTurnRight;
+                m_estate = state::start_turning;
+                std::cout << "Turn to " << fYawTarget << std::endl;
+                return RobotCommandTurn(fYawTarget);
+            } else if(state::start_turning == m_estate) {
+                if(ecmdTURN==ecmdLast) {
+                    m_estate = state::turning;
+                    std::cout << "Turn started." << std::endl;
                 }
-            } else if(state::turning_left == m_estate) {
+            } else if(state::turning == m_estate) {
                 // start moving when heading is correct
-                if(fAngle<0) {
-                    return c_rcmdTurnLeft;
-                } else {
-                    m_estate = state::moving;
-                    return c_rcmdForward;
-                }
-            } else if(state::turning_right == m_estate) {
-                if(0<fAngle) {
-                    return c_rcmdTurnRight;
-                } else {
+                if(ecmdSTOP==ecmdLast) {
+                    std::cout << "Stopped turn." << std::endl;
                     m_estate = state::moving;
                     return c_rcmdForward;
                 }
@@ -91,7 +86,7 @@ namespace rbt {
                 assert(state::moving == m_estate);
                 
                 // Don't drive into obstacle
-                // TODO: The robot stops before an obstacle, updates path,
+                // TODO: The    robot stops before an obstacle, updates path,
                 // the map changes and the robot position in the eroded
                 // map turns black, Find best path to safe terrain.
                 // Build distance map on original map instead of erosion?
@@ -120,8 +115,7 @@ namespace rbt {
                 return c_rcmdForward;
             }
         }
-        assert(false);
-        return c_rcmdStop;
+        return boost::none;
     }
     
     void CEdgeFollowingStrategy::FindNewTarget(point<double> const& ptf, COccupancyGrid const& occgrid, int const nMaxExplorationDistance ) {

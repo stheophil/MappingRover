@@ -184,13 +184,53 @@ void OnDisconnection() {
     digitalWrite(RELAY_PIN, HIGH);
 }
 
+unsigned long g_nLastCommand = 0; // time in millis() of last command
+SRobotCommand g_cmdLastCommand;
+
+static const int c_nMinYaw = (int)(-M_PI * 1000 + 0.5);
+static const int c_nMaxYaw = (int)(M_PI * 1000 + 0.5);
+
+int YawDifference(short nYawTarget) {
+    int nYawDiff = nYawTarget - g_nYaw;
+    if(nYawDiff<c_nMinYaw) nYawDiff+=2*c_nMaxYaw;
+    if(c_nMaxYaw<=nYawDiff) nYawDiff-=2*c_nMaxYaw;
+    return nYawDiff;
+} // < 0 -> turn left
+
 void HandleCommand(SRobotCommand const& cmd) {
+    g_cmdLastCommand = cmd;
+    g_nLastCommand = millis();
+    
     switch(cmd.m_cmd) {
         case ecmdMOVE:
+        case ecmdTURN360:
+        case ecmdTURN:
         {
+            short nSpeedLeft;
+            short nSpeedRight;
+            if(ecmdMOVE==cmd.m_cmd) {
+                nSpeedLeft = cmd.arg.move.m_nSpeedLeft;
+                nSpeedRight = cmd.arg.move.m_nSpeedRight;
+            } else {
+                bool const bTurnLeft = ecmdTURN360==cmd.m_cmd || YawDifference(cmd.arg.turn.m_nYawTarget)<0;
+                nSpeedLeft = cmd.arg.turn.m_nSpeed * (bTurnLeft ? -1 : 1);
+                nSpeedRight = cmd.arg.turn.m_nSpeed * (bTurnLeft ? 1 : -1);
+
+                if(ecmdTURN360==cmd.m_cmd) {
+                    g_cmdLastCommand.arg.turn.m_nYawTarget = g_nYaw;
+                    Serial.println("Turn 360");
+                } else {
+                    Serial.print("Turn ");
+                    Serial.print(bTurnLeft ? "left " : "right ");
+                    Serial.print(g_nYaw);
+                    Serial.print(" -> ");
+                    Serial.println(cmd.arg.turn.m_nYawTarget);
+                }
+            }
+            
             bool bReverse = false;
             for(int i=0; i<countof(g_amotors); ++i) {
-                int nSpeed = i%2==0 ? cmd.m_nSpeedLeft : cmd.m_nSpeedRight;
+                int nSpeed = i%2==0 ? nSpeedLeft : nSpeedRight;
                 bReverse = bReverse || (nSpeed < 0 != g_amotors[i].m_bReverse);
             }
             if(bReverse) { // stop all motors and reset PID
@@ -202,11 +242,11 @@ void HandleCommand(SRobotCommand const& cmd) {
             }
                 
             // LEFT MOTORS:
-            g_amotors[0].SetSpeed(constrain(cmd.m_nSpeedLeft, -MAX_SPEED, MAX_SPEED));
-            g_amotors[2].SetSpeed(constrain(cmd.m_nSpeedLeft, -MAX_SPEED, MAX_SPEED));
+            g_amotors[0].SetSpeed(constrain(nSpeedLeft, -MAX_SPEED, MAX_SPEED));
+            g_amotors[2].SetSpeed(constrain(nSpeedLeft, -MAX_SPEED, MAX_SPEED));
             // RIGHT MOTORS
-            g_amotors[1].SetSpeed(constrain(cmd.m_nSpeedRight, -MAX_SPEED, MAX_SPEED));
-            g_amotors[3].SetSpeed(constrain(cmd.m_nSpeedRight, -MAX_SPEED, MAX_SPEED));
+            g_amotors[1].SetSpeed(constrain(nSpeedRight, -MAX_SPEED, MAX_SPEED));
+            g_amotors[3].SetSpeed(constrain(nSpeedRight, -MAX_SPEED, MAX_SPEED));
             break;
         }
         case ecmdSTOP:
@@ -246,12 +286,13 @@ void SendSensorData() {
     } // ~ 20 ms
     
     SSensorData data = {
-        g_nRoll, g_nPitch, g_nYaw,
+        g_nYaw,
         nAngle, nDistance,
         g_amotors[0].Pop(),
         g_amotors[1].Pop(),
         g_amotors[2].Pop(),
-        g_amotors[3].Pop()
+        g_amotors[3].Pop(),
+        g_cmdLastCommand.m_cmd
     };
     ble_write_bytes((byte*)&data, sizeof(data));
 }
@@ -265,7 +306,6 @@ void SendSensorData() {
 #else
 
 bool g_bConnected = false;
-unsigned long g_nLastCommand = 0;
 static const unsigned long c_nTIMETOSTOP = 200; // ms
 
 void loop()
@@ -277,13 +317,35 @@ void loop()
         if(g_bConnected) {
             OnConnection();
         } else {
+            g_cmdLastCommand = c_rcmdStop;
             OnDisconnection();
         }
     }
     
     if(g_bConnected) {
-        if(ble_available())
-        {
+        if(ecmdTURN360==g_cmdLastCommand.m_cmd || ecmdTURN==g_cmdLastCommand.m_cmd) {
+            const int nYawTolerance = 17; // ~ pi/180 * 1000 ie one degree
+            int const nYawDiff = YawDifference(g_cmdLastCommand.arg.turn.m_nYawTarget);
+            
+            // wait a bit before comparing angles when rotating 360
+            if(ecmdTURN360==g_cmdLastCommand.m_cmd) {
+                if(1500 < millis() - g_nLastCommand
+                && nYawDiff >= -nYawTolerance && nYawDiff < 3*nYawTolerance) { // Upper tolerance depends on turn speed!
+                    Serial.println("Turned 360 deg. Stopping");
+                    HandleCommand(c_rcmdStop);
+                }
+            } else {
+                bool const bTurnLeft = g_amotors[0].m_bReverse;
+                if(abs(nYawDiff)<=nYawTolerance) {
+                    Serial.println("Turn complete. Stopping");
+                    HandleCommand(c_rcmdStop);
+                } else if(bTurnLeft != nYawDiff<=0) {
+                    Serial.println("Wrong direction. Did yaw measurement change? Try again.");
+                    HandleCommand(g_cmdLastCommand);
+                }
+            }
+            
+        } else if(ble_available()) {
             SRobotCommand cmd;
             char* pcmd = (char*)&cmd;
             char* pcmdEnd = pcmd+sizeof(SRobotCommand);
@@ -291,7 +353,6 @@ void loop()
                 *pcmd = ble_read();
             }
             if(pcmd==pcmdEnd) {
-                g_nLastCommand = millis();
                 HandleCommand(cmd);
             } else {
                 Serial.print("Incomplete Command. Read ");
@@ -299,8 +360,7 @@ void loop()
                 Serial.println(" bytes");
             }
         } else if(c_nTIMETOSTOP < millis()-g_nLastCommand) {
-            SRobotCommand cmdStop = {ecmdSTOP, 0, 0};
-            HandleCommand(cmdStop);
+            HandleCommand(c_rcmdStop);
         }
         for(int i=0; i<countof(g_amotors); ++i) {
             g_amotors[i].ComputePID(g_apid[i]); // effective sample time ~ 130 ms

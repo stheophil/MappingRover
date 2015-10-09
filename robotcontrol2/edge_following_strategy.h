@@ -10,11 +10,15 @@
 #define edge_following_strategy_hpp
 
 #include "occupancy_grid.h"
+#include <boost/optional.hpp>
 
 namespace rbt {
     struct CEdgeFollowingStrategy {
         CEdgeFollowingStrategy() {}
-        SRobotCommand update(point<double> const& ptfPrev, point<double> const& ptf, double fYawPrev, double fYaw, COccupancyGrid const& occgrid);
+        boost::optional<SRobotCommand> update(point<double> const& ptfPrev, point<double> const& ptf,
+                                              double fYawPrev, double fYaw,
+                                              ECommand ecmdLast,
+                                              COccupancyGrid const& occgrid);
         
         cv::Mat const& FeatureRGBMap() const { return m_matrgbMapFeatures; }
         
@@ -30,13 +34,12 @@ namespace rbt {
         
         enum class state {
             stopped,
-            turning_left,
-            turning_right,
+            start_turning,
+            turning,
             moving,
             stopped_after_turn
         } m_estate = state::stopped;
         rbt::point<int> m_ptnTarget = rbt::point<int>::invalid();
-        double m_fYawTarget; // valid if m_ptnTarget invalid && turning_left
     };
 }
 #endif /* edge_following_strategy_hpp */
